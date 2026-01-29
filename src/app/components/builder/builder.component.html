@@ -1,66 +1,111 @@
 <div class="container">
+  <div class="header-section">
+    <h1>Ultimate PC Builder</h1>
+    <p>Build your dream car with automatic compatibility check</p>
+  </div>
+
   <div class="layout">
     <div class="parts-list">
       @for (cat of categories; track cat.key) {
         <div class="category-section">
-          <h2>{{ cat.label }}</h2>
+          <div class="cat-header">
+            <h2>{{ cat.label }}</h2>
+          </div>
 
-          @if (builderService.build()[cat.key]; as selected) {
-            <div class="selected-card">
-              <img [src]="selected.image" [alt]="selected.name" />
-              <div>
-                <strong>{{ selected.name }}</strong>
-                <p>${{ selected.price }}</p>
+          <div class="cat-content">
+            @if (builderService.build()[cat.key]; as selected) {
+              <div class="selected-view">
+                <img
+                  [src]="selected.image || defaultImage"
+                  (error)="handleMissingImage($event)"
+                  [alt]="selected.name"
+                />
+                <div class="info">
+                  <strong>{{ selected.name }}</strong>
+                  <span>${{ selected.price }}</span>
+                </div>
+                <button
+                  class="btn-remove"
+                  (click)="builderService.removeProduct(cat.key)"
+                  title="Delete"
+                >
+                  ✕
+                </button>
               </div>
-              <button (click)="builderService.removeProduct(cat.key)">❌</button>
-            </div>
-          }
+            } @else {
+              <div class="products-grid">
+                @for (product of getProductsByCategory(cat.key); track product.id) {
+                  <div class="product-card" (click)="selectProduct(cat.key, product)">
+                    <div class="img-wrapper">
+                      <img
+                        [src]="product.image || defaultImage"
+                        (error)="handleMissingImage($event)"
+                        [alt]="product.name"
+                        loading="lazy"
+                      />
+                    </div>
 
-          <div class="products-grid">
-            @for (product of getProductsByCategory(cat.key); track product.id) {
-              <button
-                class="product-btn"
-                [class.active]="builderService.build()[cat.key]?.id === product.id"
-                (click)="selectProduct(cat.key, product)"
-              >
-                {{ product.name }} ({{
-                  product.specs.socket || product.specs.memoryType || product.specs.wattage + 'W'
-                }}) - ${{ product.price }}
-              </button>
+                    <h3>{{ product.name }}</h3>
+
+                    <div class="specs">
+                      {{
+                        product.specs.socket ||
+                          product.specs.memoryType ||
+                          product.specs.wattage + 'W'
+                      }}
+                    </div>
+
+                    <div class="price">${{ product.price }}</div>
+                  </div>
+                }
+                @if (getProductsByCategory(cat.key).length === 0) {
+                  <div class="empty-filter">
+                    There are no compatible components for your build. Try changing your processor
+                    or motherboard.
+                  </div>
+                }
+              </div>
             }
           </div>
         </div>
       }
     </div>
 
-    <div class="summary-panel">
-      <div class="sticky-box">
-        <h2>Your build</h2>
+    <aside class="summary-panel">
+      <div class="sticky-wrapper">
+        <div class="summary-card">
+          <h2>Summary</h2>
 
-        <div class="stats">
-          <p>
-            Power: <strong>{{ builderService.totalWattage() }}W</strong>
-          </p>
-          <p>
-            Price: <strong>${{ builderService.totalPrice() }}</strong>
-          </p>
-        </div>
-
-        @if (builderService.compatibilityIssues().length > 0) {
-          <div class="issues">
-            <h3>⚠️ Issues:</h3>
-            <ul>
-              @for (issue of builderService.compatibilityIssues(); track issue) {
-                <li>{{ issue }}</li>
-              }
-            </ul>
+          <div class="stat-row">
+            <span>Power Draw</span>
+            <span>{{ builderService.totalWattage() }}W</span>
           </div>
-        } @else {
-          @if (builderService.totalPrice() > 0) {
-            <div class="success">✅ Build is compatible!</div>
+
+          <div class="stat-row">
+            <span>Items</span>
+            <span>7 pcs</span>
+          </div>
+
+          <div class="stat-row total">
+            <span>Total</span>
+            <span>${{ builderService.totalPrice() }}</span>
+          </div>
+
+          <button class="btn-checkout">🛒 Buy Build</button>
+
+          @if (builderService.compatibilityIssues().length > 0) {
+            <div class="issues-list">
+              @for (issue of builderService.compatibilityIssues(); track issue) {
+                <div class="issue-item">⚠️ {{ issue }}</div>
+              }
+            </div>
+          } @else {
+            @if (builderService.totalPrice() > 0) {
+              <div class="status-ok">✅ Fully Compatible</div>
+            }
           }
-        }
+        </div>
       </div>
-    </div>
+    </aside>
   </div>
 </div>

@@ -10,7 +10,7 @@ export interface Product {
     socket?: string; // For CPU and Motherboard (e.g. "AM5", "LGA1700")
     memoryType?: string; // For RAM and Motherboard (e.g. "DDR5")
     wattage?: number; // For PSU (power) and others (consumption)
-    formFactor?: string; // ATX, Micro-ATX
+    formFactor?: string; // ATX, Micro-ATX, Mini-ITX
   };
 }
 

@@ -1,135 +1,239 @@
 @use 'styles/variables' as *;
 @use 'styles/mixins' as *;
-@use 'sass:color';
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: $spacing-xl $spacing-md;
+}
+
+.header-section {
+  text-align: center;
+  margin-bottom: $spacing-xl;
+
+  h1 {
+    font-size: 2.5rem;
+    background: linear-gradient(135deg, $color-primary, $color-primary-dark);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: $spacing-xs;
+  }
+
+  p {
+    color: $color-secondary;
+  }
+}
 
 .layout {
   display: grid;
-  grid-template-columns: 1fr 320px;
+  grid-template-columns: 1fr 380px;
   gap: $spacing-xl;
+  align-items: start;
 
   @include mobile {
     grid-template-columns: 1fr;
   }
 }
 
-// --- Left Column: Categories ---
 .category-section {
   @include card;
-  padding: $spacing-lg;
-  margin-bottom: $spacing-lg;
+  padding: 0;
+  margin-bottom: $spacing-xl;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.08);
 
-  h2 {
-    margin-bottom: $spacing-md;
-    font-size: 1.25rem;
-    border-bottom: 2px solid $bg-body;
-    padding-bottom: $spacing-xs;
+  .cat-header {
+    background: #f8fafc;
+    padding: $spacing-md $spacing-lg;
+    border-bottom: 1px solid #e2e8f0;
+
+    h2 {
+      font-size: 1.1rem;
+      margin: 0;
+      color: $text-main;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  }
+
+  .cat-content {
+    padding: $spacing-lg;
   }
 }
 
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: $spacing-md;
 }
 
-.product-btn {
-  @include card;
+.product-card {
+  border: 1px solid #e2e8f0;
+  border-radius: $radius-md;
   padding: $spacing-md;
-  text-align: left;
   cursor: pointer;
-  border: 2px solid transparent;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  background: white;
+  position: relative;
+  overflow: hidden;
+
+  .img-wrapper {
+    height: 140px;
+    margin-bottom: $spacing-md;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    img {
+      max-height: 100%;
+      max-width: 100%;
+      object-fit: contain;
+      transition: transform 0.3s;
+    }
+  }
+
+  h3 {
+    font-size: 0.95rem;
+    margin-bottom: $spacing-xs;
+    line-height: 1.4;
+    height: 2.8em;
+    overflow: hidden;
+  }
+
+  .specs {
+    font-size: 0.75rem;
+    color: $color-secondary;
+    background: #f1f5f9;
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-bottom: $spacing-sm;
+  }
+
+  .price {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: $text-main;
+  }
 
   &:hover {
-    border-color: rgba($color-primary, 0.3);
-    transform: translateY(-2px);
+    border-color: $color-primary;
+    box-shadow: 0 10px 25px -5px rgba($color-primary, 0.15);
+    transform: translateY(-4px);
+
+    .img-wrapper img {
+      transform: scale(1.05);
+    }
   }
 
   &.active {
     border-color: $color-primary;
-    background-color: rgba($color-primary, 0.05);
+    background: #eff6ff;
+    ring: 2px solid $color-primary;
   }
 }
 
-.selected-card {
-  @include card;
-  @include flex-between;
-  background: rgba($color-success, 0.1);
-  border: 1px solid $color-success;
+.selected-view {
+  display: flex;
+  align-items: center;
+  gap: $spacing-lg;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: $radius-md;
   padding: $spacing-md;
-  margin-bottom: $spacing-md;
+
+  img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    background: white;
+    border-radius: $radius-sm;
+    padding: 4px;
+    border: 1px solid #e2e8f0;
+  }
+
+  .info {
+    flex: 1;
+  }
 
   strong {
     display: block;
-    color: color.adjust($color-success, $lightness: -20%);
+    color: $text-main;
+  }
+  span {
+    font-size: 0.85rem;
+    color: #15803d;
   }
 
-  button {
-    background: transparent;
-    border: none;
+  .btn-remove {
+    background: white;
+    border: 1px solid #e2e8f0;
+    color: $color-danger;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    font-size: 1.2rem;
-    opacity: 0.6;
-    transition: opacity 0.2s;
+    transition: all 0.2s;
 
     &:hover {
-      opacity: 1;
+      background: #fee2e2;
+      border-color: #fecaca;
     }
   }
 }
 
-// --- Right Column: Summary ---
-.sticky-box {
-  @include card;
-  position: sticky;
-  top: 100px;
-  padding: $spacing-lg;
-  background: $bg-dark;
-  color: $text-inverse;
+.summary-panel {
+  .sticky-wrapper {
+    position: sticky;
+    top: 100px;
+  }
+
+  .summary-card {
+    @include card;
+    padding: $spacing-xl;
+    background: $bg-dark;
+    color: white;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+  }
 
   h2 {
-    color: $text-inverse;
+    color: white;
     margin-bottom: $spacing-lg;
-  }
-}
-
-.stats {
-  p {
-    @include flex-between;
-    margin-bottom: $spacing-sm;
-    font-size: 1.1rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding-bottom: $spacing-xs;
+    padding-bottom: $spacing-md;
   }
-}
 
-.issues {
-  background: rgba($color-danger, 0.2);
-  border: 1px solid $color-danger;
-  color: #fca5a5;
-  padding: $spacing-md;
-  border-radius: $radius-sm;
-  margin-top: $spacing-lg;
-
-  h3 {
-    color: #fecaca;
+  .stat-row {
+    @include flex-between;
+    margin-bottom: $spacing-md;
     font-size: 1rem;
-    margin-bottom: $spacing-xs;
-  }
-  ul {
-    padding-left: $spacing-lg;
-  }
-  li {
-    margin-bottom: 4px;
-  }
-}
 
-.success {
-  background: rgba($color-success, 0.2);
-  border: 1px solid $color-success;
-  color: $color-success;
-  padding: $spacing-md;
-  border-radius: $radius-sm;
-  margin-top: $spacing-lg;
-  text-align: center;
-  font-weight: 700;
+    &.total {
+      margin-top: $spacing-lg;
+      padding-top: $spacing-lg;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: $color-accent;
+    }
+  }
+
+  .btn-checkout {
+    @include btn-primary;
+    width: 100%;
+    justify-content: center;
+    padding: $spacing-md;
+    font-size: 1.1rem;
+    margin-top: $spacing-lg;
+    background: $color-accent;
+    color: black;
+
+    &:hover {
+      filter: brightness(1.1);
+    }
+  }
 }
