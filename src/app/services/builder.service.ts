@@ -1,4 +1,4 @@
-import { computed, Injectable, signal } from '@angular/core';
+import { computed, effect, Injectable, signal } from '@angular/core';
 import { Category, PCBuild, Product } from '../models/product.model';
 
 @Injectable({
@@ -14,6 +14,24 @@ export class BuilderService {
     psu: null,
     case: null,
   });
+
+  constructor() {
+    // LOADING: At startup, we try to get data
+    const saved = localStorage.getItem('pc-build');
+    if (saved) {
+      try {
+        this.build.set(JSON.parse(saved));
+      } catch (e) {
+        console.error('Corrupted save file');
+      }
+    }
+
+    // SAVE: Automatically save with every change
+    effect(() => {
+      const currentBuild = this.build();
+      localStorage.setItem('pc-build', JSON.stringify(currentBuild));
+    });
+  }
 
   public totalPrice = computed(() => {
     const b = this.build();

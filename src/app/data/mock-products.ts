@@ -23,7 +23,7 @@ export const PRODUCTS: Product[] = [
     name: 'Intel Core i5-13600K',
     price: 299,
     category: 'cpu',
-    image: 'https://m.media-amazon.com/images/I/6125mFrzr6L._AC_SL1000_.jpg',
+    image: 'https://m.media-amazon.com/images/I/6125mFrzr6Ln._AC_SL1000_.jpg',
     specs: { socket: 'LGA1700', wattage: 181 },
   },
   {
