@@ -40,6 +40,11 @@ export class BuilderService {
       .reduce((total, product) => total + product.price, 0);
   });
 
+  public selectedItemsCount = computed(() => {
+    const b = this.build();
+    return Object.values(b).filter((p) => p !== null).length;
+  });
+
   public totalWattage = computed(() => {
     const b = this.build();
     // Assume the base system consumption is 50W
