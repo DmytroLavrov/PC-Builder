@@ -1,0 +1,69 @@
+@use 'styles/variables' as *;
+@use 'styles/mixins' as *;
+@use 'sass:color';
+
+.app-header {
+  background: $bg-dark;
+  color: $text-inverse;
+  padding: $spacing-md 0;
+  box-shadow: $shadow-md;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-content {
+  @include flex-between;
+}
+
+.logo {
+  @include flex-center;
+  gap: $spacing-sm;
+
+  h1 {
+    color: $text-inverse;
+    font-size: 1.5rem;
+    margin: 0;
+  }
+
+  .icon {
+    font-size: 1.5rem;
+  }
+}
+
+nav {
+  @include flex-center;
+  gap: $spacing-md;
+}
+
+.nav-link {
+  background: transparent;
+  border: none;
+  color: $text-muted;
+  cursor: pointer;
+  font-weight: 500;
+  transition: color 0.2s;
+
+  &:hover {
+    color: $text-inverse;
+  }
+}
+
+.btn-login {
+  @include btn-primary;
+  padding: $spacing-xs $spacing-lg;
+}
+
+main {
+  min-height: 80vh;
+  padding-top: $spacing-xl;
+  padding-bottom: $spacing-xl;
+}
+
+.app-footer {
+  background: color.adjust($bg-dark, $lightness: -5%);
+  color: $text-muted;
+  text-align: center;
+  padding: $spacing-lg;
+  margin-top: auto;
+}
