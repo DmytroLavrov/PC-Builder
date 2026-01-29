@@ -1,8 +1,9 @@
 import { Component, signal } from '@angular/core';
+import { BuilderComponent } from '@components/builder/builder.component';
 
 @Component({
   selector: 'app-root',
-  imports: [],
+  imports: [BuilderComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })

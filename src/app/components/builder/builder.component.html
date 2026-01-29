@@ -1,0 +1,68 @@
+<div class="container">
+  <h1>🖥️ PC Configurator</h1>
+
+  <div class="layout">
+    <div class="parts-list">
+      @for (cat of categories; track cat.key) {
+        <div class="category-section">
+          <h2>{{ cat.label }}</h2>
+
+          @if (builderService.build()[cat.key]; as selected) {
+            <div class="selected-card">
+              <img [src]="selected.image" [alt]="selected.name" />
+              <div>
+                <strong>{{ selected.name }}</strong>
+                <p>${{ selected.price }}</p>
+              </div>
+              <button (click)="builderService.removeProduct(cat.key)">❌</button>
+            </div>
+          }
+
+          <div class="products-grid">
+            @for (product of getProductsByCategory(cat.key); track product.id) {
+              <button
+                class="product-btn"
+                [class.active]="builderService.build()[cat.key]?.id === product.id"
+                (click)="selectProduct(cat.key, product)"
+              >
+                {{ product.name }} ({{
+                  product.specs.socket || product.specs.memoryType || product.specs.wattage + 'W'
+                }}) - ${{ product.price }}
+              </button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="summary-panel">
+      <div class="sticky-box">
+        <h2>Your build</h2>
+
+        <div class="stats">
+          <p>
+            Power: <strong>{{ builderService.totalWattage() }}W</strong>
+          </p>
+          <p>
+            Price: <strong>${{ builderService.totalPrice() }}</strong>
+          </p>
+        </div>
+
+        @if (builderService.compatibilityIssues().length > 0) {
+          <div class="issues">
+            <h3>⚠️ Issues:</h3>
+            <ul>
+              @for (issue of builderService.compatibilityIssues(); track issue) {
+                <li>{{ issue }}</li>
+              }
+            </ul>
+          </div>
+        } @else {
+          @if (builderService.totalPrice() > 0) {
+            <div class="success">✅ Build is compatible!</div>
+          }
+        }
+      </div>
+    </div>
+  </div>
+</div>
