@@ -1,0 +1,62 @@
+@use 'styles/variables' as *;
+
+// Fast Flexbox
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+// Card style (shadow, background, rounding)
+@mixin card {
+  background: $bg-card;
+  border-radius: $radius-md;
+  box-shadow: $shadow-sm;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+// Button style
+@mixin btn-base {
+  border: none;
+  cursor: pointer;
+  padding: $spacing-sm $spacing-md;
+  border-radius: $radius-sm;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-xs;
+  font-family: inherit;
+}
+
+@mixin btn-primary {
+  @include btn-base;
+  background: $color-primary;
+  color: $text-inverse;
+
+  &:hover {
+    background: $color-primary-dark;
+    box-shadow: $shadow-md;
+  }
+}
+
+// Adaptive (Mobile First approach or Desktop First)
+@mixin mobile {
+  @media (max-width: 768px) {
+    @content;
+  }
+}
