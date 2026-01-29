@@ -61,8 +61,45 @@ export class BuilderService {
       );
     }
 
+    // Check: CASE vs BOARD
+    if (b.case && b.motherboard) {
+      const caseSize = b.case.specs.formFactor;
+      const boardSize = b.motherboard.specs.formFactor;
+      if (caseSize === 'Micro-ATX' && boardSize === 'ATX') {
+        errors.push(
+          `Physical incompatibility: Board ${boardSize} will not fit in case ${caseSize}!`,
+        );
+      }
+
+      if (caseSize === 'Mini-ITX' && (boardSize === 'ATX' || boardSize === 'Micro-ATX')) {
+        errors.push(`The board is too big for this Mini-ITX case.`);
+      }
+    }
+
     return errors;
   });
+
+  public filterProducts(category: Category, allProducts: Product[]): Product[] {
+    const b = this.build();
+    let products = allProducts.filter((p) => p.category === category);
+
+    // 1. Motherboard filter by CPU
+    if (category === 'motherboard' && b.cpu) {
+      products = products.filter((p) => p.specs.socket === b.cpu?.specs.socket);
+    }
+
+    // 2. CPU filter by Motherboard (if the board was selected first)
+    if (category === 'cpu' && b.motherboard) {
+      products = products.filter((p) => p.specs.socket === b.motherboard?.specs.socket);
+    }
+
+    // 3. RAM filter by Materynka
+    if (category === 'ram' && b.motherboard) {
+      products = products.filter((p) => p.specs.memoryType === b.motherboard?.specs.memoryType);
+    }
+
+    return products;
+  }
 
   public selectProduct(category: Category, product: Product): void {
     this.build.update((current) => ({
