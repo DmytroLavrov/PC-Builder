@@ -14,17 +14,19 @@ export class BuilderComponent {
   public builderService: BuilderService = inject(BuilderService);
 
   public categories: { key: Category; label: string }[] = [
-    { key: 'cpu', label: 'Processor' },
+    { key: 'cpu', label: 'Processor (CPU)' },
     { key: 'motherboard', label: 'Motherboard' },
-    { key: 'ram', label: 'RAM' },
-    { key: 'gpu', label: 'Video card' },
-    { key: 'psu', label: 'Power supply unit' },
+    { key: 'ram', label: 'Memory (RAM)' },
+    { key: 'gpu', label: 'Graphics Card' },
+    { key: 'storage', label: 'Storage (SSD)' },
+    { key: 'psu', label: 'Power Supply' },
+    { key: 'case', label: 'PC Case' },
   ];
 
   public allProducts = PRODUCTS;
 
   public getProductsByCategory(category: Category): Product[] {
-    return this.allProducts.filter((p) => p.category === category);
+    return this.builderService.filterProducts(category, this.allProducts);
   }
 
   public selectProduct(category: Category, product: Product): void {
