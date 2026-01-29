@@ -15,7 +15,11 @@
           <div class="cat-content">
             @if (builderService.build()[cat.key]; as selected) {
               <div class="selected-view">
-                <img [src]="selected.image" [alt]="selected.name" />
+                <img
+                  [src]="selected.image || defaultImage"
+                  (error)="handleMissingImage($event)"
+                  [alt]="selected.name"
+                />
                 <div class="info">
                   <strong>{{ selected.name }}</strong>
                   <span>${{ selected.price }}</span>
@@ -33,7 +37,12 @@
                 @for (product of getProductsByCategory(cat.key); track product.id) {
                   <div class="product-card" (click)="selectProduct(cat.key, product)">
                     <div class="img-wrapper">
-                      <img [src]="product.image" loading="lazy" [alt]="product.name" />
+                      <img
+                        [src]="product.image || defaultImage"
+                        (error)="handleMissingImage($event)"
+                        [alt]="product.name"
+                        loading="lazy"
+                      />
                     </div>
 
                     <h3>{{ product.name }}</h3>

@@ -13,6 +13,8 @@ import { PRODUCTS } from 'src/app/data/mock-products';
 export class BuilderComponent {
   public builderService: BuilderService = inject(BuilderService);
 
+  public defaultImage = 'https://placehold.co/600x400/1e293b/ffffff?text=PC+Component';
+
   public categories: { key: Category; label: string }[] = [
     { key: 'cpu', label: 'Processor (CPU)' },
     { key: 'motherboard', label: 'Motherboard' },
@@ -31,5 +33,9 @@ export class BuilderComponent {
 
   public selectProduct(category: Category, product: Product): void {
     this.builderService.selectProduct(category, product);
+  }
+
+  public handleMissingImage(event: Event): void {
+    (event.target as HTMLImageElement).src = this.defaultImage;
   }
 }
