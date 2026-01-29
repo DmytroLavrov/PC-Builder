@@ -199,7 +199,7 @@ export const PRODUCTS: Product[] = [
     name: 'Samsung 990 EVO 1TB NVMe SSD',
     price: 89,
     category: 'storage',
-    image: 'https://m.media-amazon.com/images/I/71abc123XYZ._AC_SL1500_.jpg',
+    image: 'https://m.media-amazon.com/images/I/61Y4k8+K0RL._AC_SL1500_.jpg',
     specs: { wattage: 5 },
   },
 
@@ -233,7 +233,7 @@ export const PRODUCTS: Product[] = [
     name: 'EVGA SuperNOVA 850 G7 (850W)',
     price: 139,
     category: 'psu',
-    image: 'https://m.media-amazon.com/images/I/71EVGA850G7.jpg',
+    image: 'https://m.media-amazon.com/images/I/61p-C0yYFJL._AC_SL1000_.jpg',
     specs: { wattage: 850 },
   },
 
@@ -259,7 +259,7 @@ export const PRODUCTS: Product[] = [
     name: 'Lian Li Lancool III RGB',
     price: 149,
     category: 'case',
-    image: 'https://m.media-amazon.com/images/I/71LianLiIII.jpg',
+    image: 'https://m.media-amazon.com/images/I/71qRQqQ9YdL._AC_SL1500_.jpg',
     specs: { formFactor: 'ATX' },
   },
 ];
