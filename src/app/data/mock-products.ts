@@ -236,6 +236,38 @@ export const PRODUCTS: Product[] = [
     image: 'https://m.media-amazon.com/images/I/61p-C0yYFJL._AC_SL1000_.jpg',
     specs: { wattage: 850 },
   },
+  {
+    id: 44,
+    name: 'MSI MEG Ai1300P PCIE5 (1300W)',
+    price: 359,
+    category: 'psu',
+    image: 'https://m.media-amazon.com/images/I/71O+l-wJ+mL._AC_SL1500_.jpg',
+    specs: { wattage: 1300 },
+  },
+  {
+    id: 45,
+    name: 'Corsair AX1600i Digital (1600W)',
+    price: 609,
+    category: 'psu',
+    image: 'https://m.media-amazon.com/images/I/71K1jV1-xXL._AC_SL1500_.jpg',
+    specs: { wattage: 1600 },
+  },
+  {
+    id: 46,
+    name: 'ASUS ROG Thor 1200W P2',
+    price: 339,
+    category: 'psu',
+    image: 'https://m.media-amazon.com/images/I/71x52R+yHUL._AC_SL1500_.jpg',
+    specs: { wattage: 1200 },
+  },
+  {
+    id: 47,
+    name: 'be quiet! Dark Power Pro 13 (1300W)',
+    price: 439,
+    category: 'psu',
+    image: 'https://m.media-amazon.com/images/I/61kCg4tW-qL._AC_SL1500_.jpg',
+    specs: { wattage: 1300 },
+  },
 
   // --- CASES (Case) ---
   {
