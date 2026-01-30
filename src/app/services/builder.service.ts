@@ -1,5 +1,5 @@
 import { computed, effect, Injectable, signal } from '@angular/core';
-import { Category, PCBuild, Product } from '../models/product.model';
+import { Category, PCBuild, Product, SavedBuild } from '../models/product.model';
 
 @Injectable({
   providedIn: 'root',
@@ -15,23 +15,156 @@ export class BuilderService {
     case: null,
   });
 
+  // List of all saved builds
+  public savedBuilds = signal<SavedBuild[]>([]);
+
+  // Current active build ID
+  public currentBuildId = signal<string | null>(null);
+
+  // Current build name
+  public currentBuildName = signal<string>('Untitled Build');
+
   constructor() {
-    // LOADING: At startup, we try to get data
-    const saved = localStorage.getItem('pc-build');
+    this.loadSavedBuilds();
+
+    // Auto-save current build
+    effect(() => {
+      const currentBuild = this.build();
+      const buildId = this.currentBuildId();
+      const buildName = this.currentBuildName();
+
+      if (buildId) {
+        this.updateSavedBuild(buildId, currentBuild, buildName);
+      }
+    });
+  }
+
+  private loadSavedBuilds(): void {
+    const saved = localStorage.getItem('pc-builds');
     if (saved) {
       try {
-        this.build.set(JSON.parse(saved));
+        const builds = JSON.parse(saved) as SavedBuild[];
+        this.savedBuilds.set(builds);
+
+        // Load the last active build or create new one
+        const lastActiveId = localStorage.getItem('last-active-build-id');
+        if (lastActiveId && builds.find((b) => b.id === lastActiveId)) {
+          this.loadBuild(lastActiveId);
+        } else if (builds.length > 0) {
+          this.loadBuild(builds[0].id);
+        } else {
+          this.createNewBuild('My First Build');
+        }
       } catch (e) {
         console.error('Corrupted save file');
+        this.createNewBuild('My First Build');
+      }
+    } else {
+      this.createNewBuild('My First Build');
+    }
+  }
+
+  private saveBuildsToStorage(): void {
+    localStorage.setItem('pc-builds', JSON.stringify(this.savedBuilds()));
+    if (this.currentBuildId()) {
+      localStorage.setItem('last-active-build-id', this.currentBuildId()!);
+    }
+  }
+
+  public createNewBuild(name: string = 'New Build'): void {
+    const newBuild: SavedBuild = {
+      id: crypto.randomUUID(),
+      name,
+      build: {
+        cpu: null,
+        motherboard: null,
+        ram: null,
+        gpu: null,
+        storage: null,
+        psu: null,
+        case: null,
+      },
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    };
+
+    this.savedBuilds.update((builds) => [newBuild, ...builds]);
+    this.currentBuildId.set(newBuild.id);
+    this.currentBuildName.set(newBuild.name);
+    this.build.set(newBuild.build);
+    this.saveBuildsToStorage();
+  }
+
+  public loadBuild(id: string): void {
+    const savedBuild = this.savedBuilds().find((b) => b.id === id);
+    if (savedBuild) {
+      this.currentBuildId.set(savedBuild.id);
+      this.currentBuildName.set(savedBuild.name);
+      this.build.set(savedBuild.build);
+      this.saveBuildsToStorage();
+    }
+  }
+
+  public updateSavedBuild(id: string, build: PCBuild, name: string): void {
+    this.savedBuilds.update((builds) => {
+      const index = builds.findIndex((b) => b.id === id);
+      if (index !== -1) {
+        builds[index] = {
+          ...builds[index],
+          name,
+          build,
+          updatedAt: Date.now(),
+        };
+      }
+      return [...builds];
+    });
+    this.saveBuildsToStorage();
+  }
+
+  public deleteBuild(id: string): void {
+    const builds = this.savedBuilds();
+    const index = builds.findIndex((b) => b.id === id);
+
+    if (index === -1) return;
+
+    // If deleting current build, switch to another
+    if (this.currentBuildId() === id) {
+      const nextBuild = builds[index + 1] || builds[index - 1];
+      if (nextBuild) {
+        this.loadBuild(nextBuild.id);
+      } else {
+        // No builds left, create new one
+        this.savedBuilds.update((builds) => builds.filter((b) => b.id !== id));
+        this.createNewBuild('My Build');
+        return;
       }
     }
 
-    // SAVE: Automatically save with every change
-    effect(() => {
-      const currentBuild = this.build();
-      localStorage.setItem('pc-build', JSON.stringify(currentBuild));
-    });
+    this.savedBuilds.update((builds) => builds.filter((b) => b.id !== id));
+    this.saveBuildsToStorage();
   }
+
+  public renameBuild(name: string): void {
+    this.currentBuildName.set(name);
+  }
+
+  public duplicateBuild(id: string): void {
+    const original = this.savedBuilds().find((b) => b.id === id);
+    if (!original) return;
+
+    const duplicate: SavedBuild = {
+      id: crypto.randomUUID(),
+      name: `${original.name} (Copy)`,
+      build: { ...original.build },
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    };
+
+    this.savedBuilds.update((builds) => [duplicate, ...builds]);
+    this.saveBuildsToStorage();
+  }
+
+  // === EXISTING COMPUTED VALUES ===
 
   public totalPrice = computed(() => {
     const b = this.build();
@@ -50,8 +183,11 @@ export class BuilderService {
     // Assume the base system consumption is 50W
     let total = 50;
     Object.values(b).forEach((p) => {
-      if (p?.specs.wattage) total += p.specs.wattage;
+      if (p?.specs.wattage && p.category !== 'psu') {
+        total += p.specs.wattage;
+      }
     });
+
     return total;
   });
 
@@ -101,6 +237,8 @@ export class BuilderService {
 
     return errors;
   });
+
+  // === EXISTING METHODS ===
 
   public filterProducts(category: Category, allProducts: Product[]): Product[] {
     const b = this.build();

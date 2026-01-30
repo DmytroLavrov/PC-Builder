@@ -1,0 +1,48 @@
+<div class="builds-manager">
+  <div class="builds-header">
+    <div class="current-build-info">
+      <input
+        type="text"
+        class="build-name-input"
+        [value]="builderService.currentBuildName()"
+        (blur)="renameBuild($event)"
+        (keyup.enter)="$event.target.blur()"
+        placeholder="Build name..."
+      />
+      <span class="build-meta"> {{ builderService.selectedItemsCount() }} / 7 components </span>
+    </div>
+
+    <button class="btn-new-build" (click)="createNewBuild()">➕ New Build</button>
+  </div>
+
+  <div class="builds-dropdown" [class.open]="isDropdownOpen()">
+    <button class="dropdown-trigger" (click)="toggleDropdown()">
+      My Builds ({{ builderService.savedBuilds().length }})
+      <span class="arrow">{{ isDropdownOpen() ? '▲' : '▼' }}</span>
+    </button>
+
+    @if (isDropdownOpen()) {
+      <div class="dropdown-content">
+        @for (build of builderService.savedBuilds(); track build.id) {
+          <div class="build-item" [class.active]="build.id === builderService.currentBuildId()">
+            <div class="build-info" (click)="loadBuild(build.id)">
+              <strong>{{ build.name }}</strong>
+              <span class="build-stats">
+                {{ getBuildItemCount(build) }} items · ${{ getBuildPrice(build) }}
+              </span>
+              <span class="build-date">
+                {{ formatDate(build.updatedAt) }}
+              </span>
+            </div>
+            <div class="build-actions">
+              <button class="btn-icon" (click)="duplicateBuild(build.id)" title="Duplicate">
+                📋
+              </button>
+              <button class="btn-icon" (click)="deleteBuild(build.id)" title="Delete">🗑️</button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

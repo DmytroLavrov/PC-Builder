@@ -1,0 +1,178 @@
+@use 'styles/variables' as *;
+@use 'styles/mixins' as *;
+
+.builds-manager {
+  @include card;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-xl;
+
+  @include mobile {
+    padding: $spacing-md;
+    margin-bottom: $spacing-lg;
+  }
+}
+
+.builds-header {
+  @include flex-between;
+  gap: $spacing-md;
+  margin-bottom: $spacing-md;
+
+  @include mobile {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.current-build-info {
+  flex: 1;
+  @include flex-col;
+  gap: 4px;
+}
+
+.build-name-input {
+  font-size: 1.25rem;
+  font-weight: 600;
+  border: 2px solid transparent;
+  padding: 4px $spacing-xs;
+  border-radius: $radius-sm;
+  transition: all 0.2s;
+  background: transparent;
+  color: $text-main;
+  width: 100%;
+  max-width: 100%;
+
+  @include mobile {
+    font-size: 1.1rem;
+  }
+
+  &:hover {
+    background: #f8fafc;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $color-primary;
+    background: $bg-card;
+  }
+}
+
+.build-meta {
+  font-size: 0.875rem;
+  color: $text-muted;
+  padding-left: $spacing-xs;
+}
+
+.btn-new-build {
+  @include btn-primary;
+  white-space: nowrap;
+
+  @include mobile {
+    width: 100%;
+    justify-content: center;
+  }
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+}
+
+.builds-dropdown {
+  position: relative;
+}
+
+.dropdown-trigger {
+  width: 100%;
+  padding: $spacing-sm $spacing-md;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: $radius-sm;
+  font-weight: 500;
+  cursor: pointer;
+  @include flex-between;
+  transition: all 0.2s;
+
+  &:hover {
+    border-color: #cbd5e1;
+    background: #f1f5f9;
+  }
+}
+
+.dropdown-content {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: $bg-card;
+  border: 1px solid #e2e8f0;
+  border-radius: $radius-md;
+  max-height: 400px;
+  overflow-y: auto;
+  z-index: 100;
+  box-shadow: $shadow-lg;
+}
+
+.build-item {
+  @include flex-between;
+  padding: $spacing-sm $spacing-md;
+  border-bottom: 1px solid #f1f5f9;
+  transition: all 0.2s;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background: #f8fafc;
+  }
+
+  &.active {
+    background: #eff6ff;
+    border-left: 3px solid $color-primary;
+  }
+}
+
+.build-info {
+  flex: 1;
+  cursor: pointer;
+  @include flex-col;
+  gap: 4px;
+
+  strong {
+    font-size: 0.9375rem;
+    color: $text-main;
+  }
+}
+
+.build-stats {
+  font-size: 0.8125rem;
+  color: $color-secondary;
+}
+
+.build-date {
+  font-size: 0.75rem;
+  color: $text-muted;
+}
+
+.build-actions {
+  display: flex;
+  gap: $spacing-xs;
+}
+
+.btn-icon {
+  background: transparent;
+  border: none;
+  font-size: 1.125rem;
+  cursor: pointer;
+  padding: 4px $spacing-xs;
+  border-radius: 4px;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #e2e8f0;
+  }
+}
+
+.arrow {
+  font-size: 0.75rem;
+  color: $color-secondary;
+}

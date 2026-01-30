@@ -2,10 +2,11 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Category, Product } from '@models/product.model';
 import { BuilderService } from '@services/builder.service';
 import { PRODUCTS } from 'src/app/data/mock-products';
+import { BuildsManagerComponent } from './builds-manager/builds-manager.component';
 
 @Component({
   selector: 'app-builder',
-  imports: [],
+  imports: [BuildsManagerComponent],
   templateUrl: './builder.component.html',
   styleUrl: './builder.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -24,3 +24,12 @@ export interface PCBuild {
   psu: Product | null;
   case: Product | null;
 }
+
+// Saved build with metadata
+export interface SavedBuild {
+  id: string;
+  name: string;
+  build: PCBuild;
+  createdAt: number;
+  updatedAt: number;
+}
