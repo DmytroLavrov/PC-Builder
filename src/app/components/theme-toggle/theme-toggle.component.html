@@ -1,0 +1,12 @@
+<button
+  class="theme-toggle"
+  (click)="toggleTheme()"
+  [attr.aria-label]="
+    themeService.currentTheme() === 'light' ? 'Switch to dark mode' : 'Switch to light mode'
+  "
+  title="Toggle theme"
+>
+  <span class="theme-icon">
+    {{ themeService.currentTheme() === 'light' ? '🌙' : '☀️' }}
+  </span>
+</button>

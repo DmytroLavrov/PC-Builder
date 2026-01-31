@@ -20,9 +20,9 @@
 
 // Card style (shadow, background, rounding)
 @mixin card {
-  background: $bg-card;
+  background: var(--bg-card);
   border-radius: $radius-md;
-  box-shadow: $shadow-sm;
+  box-shadow: var(--shadow-sm);
   border: 1px solid rgba(0, 0, 0, 0.05);
   transition:
     transform 0.2s ease,
@@ -45,12 +45,12 @@
 
 @mixin btn-primary {
   @include btn-base;
-  background: $color-primary;
-  color: $text-inverse;
+  background: var(--color-primary);
+  color: var(--text-inverse);
 
   &:hover {
-    background: $color-primary-dark;
-    box-shadow: $shadow-md;
+    background: var(--color-primary-dark);
+    box-shadow: var(--shadow-md);
   }
 }
 
