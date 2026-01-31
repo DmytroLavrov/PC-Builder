@@ -13,14 +13,14 @@
 
   h1 {
     font-size: 2.5rem;
-    background: linear-gradient(135deg, $color-primary, $color-primary-dark);
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     margin-bottom: $spacing-xs;
   }
 
   p {
-    color: $color-secondary;
+    color: var(--color-secondary);
   }
 }
 
@@ -36,21 +36,24 @@
 }
 
 .category-section {
-  @include card;
+  background: var(--bg-card);
+  border-radius: $radius-md;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+
   padding: 0;
   margin-bottom: $spacing-xl;
   overflow: hidden;
-  border: 1px solid rgba(0, 0, 0, 0.08);
 
   .cat-header {
-    background: #f8fafc;
+    background: var(--bg-hover);
     padding: $spacing-md $spacing-lg;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--border-color);
 
     h2 {
       font-size: 1.1rem;
       margin: 0;
-      color: $text-main;
+      color: var(--text-main);
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.5px;
@@ -69,12 +72,12 @@
 }
 
 .product-card {
-  border: 1px solid #e2e8f0;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
   border-radius: $radius-md;
   padding: $spacing-md;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  background: white;
   position: relative;
   overflow: hidden;
 
@@ -85,6 +88,10 @@
     align-items: center;
     justify-content: center;
 
+    background: #ffffff;
+    border-radius: $radius-sm;
+    padding: $spacing-xs;
+
     img {
       max-height: 100%;
       max-width: 100%;
@@ -94,6 +101,7 @@
   }
 
   h3 {
+    color: var(--text-main);
     font-size: 0.95rem;
     margin-bottom: $spacing-xs;
     line-height: 1.4;
@@ -103,8 +111,8 @@
 
   .specs {
     font-size: 0.75rem;
-    color: $color-secondary;
-    background: #f1f5f9;
+    color: var(--text-muted);
+    background: var(--bg-hover);
     padding: 4px 8px;
     border-radius: 4px;
     display: inline-block;
@@ -114,12 +122,12 @@
   .price {
     font-size: 1.1rem;
     font-weight: 700;
-    color: $text-main;
+    color: var(--text-main);
   }
 
   &:hover {
-    border-color: $color-primary;
-    box-shadow: 0 10px 25px -5px rgba($color-primary, 0.15);
+    border-color: var(--color-primary);
+    box-shadow: var(--shadow-lg);
     transform: translateY(-4px);
 
     .img-wrapper img {
@@ -128,9 +136,9 @@
   }
 
   &.active {
-    border-color: $color-primary;
-    background: #eff6ff;
-    ring: 2px solid $color-primary;
+    border-color: var(--color-primary);
+    background: var(--bg-selected);
+    box-shadow: 0 0 0 2px var(--color-primary);
   }
 }
 
@@ -138,8 +146,9 @@
   display: flex;
   align-items: center;
   gap: $spacing-lg;
-  background: #f0fdf4;
-  border: 1px solid #bbf7d0;
+
+  background: var(--bg-selected);
+  border: 1px solid var(--color-primary);
   border-radius: $radius-md;
   padding: $spacing-md;
 
@@ -147,10 +156,10 @@
     width: 60px;
     height: 60px;
     object-fit: contain;
-    background: white;
+    background: #ffffff;
     border-radius: $radius-sm;
     padding: 4px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border-color);
   }
 
   .info {
@@ -159,17 +168,19 @@
 
   strong {
     display: block;
-    color: $text-main;
+    color: var(--text-main);
   }
+
   span {
     font-size: 0.85rem;
-    color: #15803d;
+    color: var(--color-success);
+    font-weight: 600;
   }
 
   .btn-remove {
-    background: white;
-    border: 1px solid #e2e8f0;
-    color: $color-danger;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--color-danger);
     width: 32px;
     height: 32px;
     border-radius: 50%;
@@ -180,8 +191,9 @@
     transition: all 0.2s;
 
     &:hover {
-      background: #fee2e2;
-      border-color: #fecaca;
+      background: var(--color-danger);
+      color: white;
+      border-color: var(--color-danger);
     }
   }
 }
@@ -193,11 +205,11 @@
   }
 
   .summary-card {
-    @include card;
+    background: var(--bg-dark);
+    border-radius: $radius-md;
+    box-shadow: var(--shadow-lg);
     padding: $spacing-xl;
-    background: $bg-dark;
     color: white;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
   }
 
   h2 {
@@ -211,6 +223,7 @@
     @include flex-between;
     margin-bottom: $spacing-md;
     font-size: 1rem;
+    color: rgba(255, 255, 255, 0.8);
 
     &.total {
       margin-top: $spacing-lg;
@@ -218,7 +231,7 @@
       border-top: 1px solid rgba(255, 255, 255, 0.1);
       font-size: 1.5rem;
       font-weight: 700;
-      color: $color-accent;
+      color: var(--color-accent);
     }
   }
 
@@ -229,11 +242,51 @@
     padding: $spacing-md;
     font-size: 1.1rem;
     margin-top: $spacing-lg;
-    background: $color-accent;
-    color: black;
+    background: var(--color-accent);
+    color: #000000;
+    font-weight: bold;
 
     &:hover {
       filter: brightness(1.1);
+      box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
     }
   }
+
+  .issues-list {
+    margin-top: $spacing-lg;
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid var(--color-danger);
+    border-radius: $radius-sm;
+    padding: $spacing-md;
+
+    .issue-item {
+      color: #fca5a5;
+      font-size: 0.9rem;
+      margin-bottom: 4px;
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  .status-ok {
+    margin-top: $spacing-lg;
+    text-align: center;
+    color: var(--color-success);
+    font-weight: 600;
+    background: rgba(16, 185, 129, 0.15);
+    padding: $spacing-sm;
+    border-radius: $radius-sm;
+    border: 1px solid var(--color-success);
+  }
+}
+
+.empty-filter {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: $spacing-xl;
+  background: var(--bg-hover);
+  border-radius: $radius-md;
+  color: var(--text-muted);
+  border: 1px dashed var(--border-color);
 }
