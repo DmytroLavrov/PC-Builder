@@ -9,5 +9,19 @@ import { ThemeToggleComponent } from '@components/theme-toggle/theme-toggle.comp
   styleUrl: './app.component.scss',
 })
 export class AppComponent {
-  protected readonly title = signal('PC-Builder');
+  public isMenuOpen: boolean = false;
+
+  public toggleMenu(): void {
+    this.isMenuOpen = !this.isMenuOpen;
+    if (this.isMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+  }
+
+  public closeMenu(): void {
+    this.isMenuOpen = false;
+    document.body.style.overflow = 'auto';
+  }
 }

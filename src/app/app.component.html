@@ -2,12 +2,28 @@
   <div class="container header-content">
     <div class="logo">
       <span class="icon">🖥️</span>
-      <h1>PC Builder</h1>
+      <h1 class="logo-text">PC Builder</h1>
     </div>
-    <nav>
-      <app-theme-toggle />
-      <button class="nav-link">My Builds</button>
-      <button class="btn-login">Sign In</button>
+
+    <button
+      class="burger-btn"
+      (click)="toggleMenu()"
+      [class.active]="isMenuOpen"
+      aria-label="Toggle menu"
+    >
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <div class="nav-overlay" [class.active]="isMenuOpen" (click)="closeMenu()"></div>
+
+    <nav class="main-nav" [class.active]="isMenuOpen">
+      <div class="nav-items">
+        <app-theme-toggle></app-theme-toggle>
+        <button class="nav-link" (click)="closeMenu()">My Builds</button>
+        <button class="btn-login" (click)="closeMenu()">Sign In</button>
+      </div>
     </nav>
   </div>
 </header>
