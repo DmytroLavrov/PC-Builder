@@ -1,8 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Category, Product } from '@models/product.model';
 import { BuilderService } from '@services/builder.service';
-import { PRODUCTS } from 'src/app/data/mock-products';
-import { BuildsManagerComponent } from './builds-manager/builds-manager.component';
+import { BuildsManagerComponent } from '@components/builder/builds-manager/builds-manager.component';
 
 @Component({
   selector: 'app-builder',
@@ -26,10 +25,8 @@ export class BuilderComponent {
     { key: 'case', label: 'PC Case' },
   ];
 
-  public allProducts = PRODUCTS;
-
   public getProductsByCategory(category: Category): Product[] {
-    return this.builderService.filterProducts(category, this.allProducts);
+    return this.builderService.filterProducts(category);
   }
 
   public selectProduct(category: Category, product: Product): void {
