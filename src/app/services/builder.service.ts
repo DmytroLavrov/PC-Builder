@@ -1,10 +1,16 @@
-import { computed, effect, Injectable, signal } from '@angular/core';
+import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { Category, PCBuild, Product, SavedBuild } from '../models/product.model';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '@env/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class BuilderService {
+  private http: HttpClient = inject(HttpClient);
+
+  public products = signal<Product[]>([]);
+
   public build = signal<PCBuild>({
     cpu: null,
     motherboard: null,
@@ -25,6 +31,7 @@ export class BuilderService {
   public currentBuildName = signal<string>('Untitled Build');
 
   constructor() {
+    this.fetchProducts();
     this.loadSavedBuilds();
 
     // Auto-save current build
@@ -36,6 +43,17 @@ export class BuilderService {
       if (buildId) {
         this.updateSavedBuild(buildId, currentBuild, buildName);
       }
+    });
+  }
+
+  private fetchProducts(): void {
+    this.http.get<Product[]>(environment.apiUrl).subscribe({
+      next: (data) => {
+        this.products.set(data);
+      },
+      error: (err) => {
+        console.error('Error connecting to server:', err);
+      },
     });
   }
 
@@ -240,7 +258,8 @@ export class BuilderService {
 
   // === EXISTING METHODS ===
 
-  public filterProducts(category: Category, allProducts: Product[]): Product[] {
+  public filterProducts(category: Category): Product[] {
+    const allProducts = this.products();
     const b = this.build();
     let products = allProducts.filter((p) => p.category === category);
 
