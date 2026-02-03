@@ -9,9 +9,12 @@
   <div class="layout">
     <div class="parts-list">
       @for (cat of categories; track cat.key) {
-        <div class="category-section">
+        <div class="category-section" [class.is-active]="activeCategory() === cat.key">
           <div class="cat-header">
             <h2>{{ cat.label }}</h2>
+            @if (!builderService.build()[cat.key] && activeCategory() === cat.key) {
+              <button class="btn-text" (click)="activeCategory.set(null)">Close</button>
+            }
           </div>
 
           <div class="cat-content">
@@ -29,44 +32,52 @@
                 <button
                   class="btn-remove"
                   (click)="builderService.removeProduct(cat.key)"
-                  title="Delete"
+                  title="Remove"
                 >
                   ✕
                 </button>
               </div>
             } @else {
-              <div class="products-grid">
-                @for (product of getProductsByCategory(cat.key); track product.id) {
-                  <div class="product-card" (click)="selectProduct(cat.key, product)">
-                    <div class="img-wrapper">
-                      <img
-                        [src]="product.image || defaultImage"
-                        (error)="handleMissingImage($event)"
-                        [alt]="product.name"
-                        loading="lazy"
-                      />
+              @if (activeCategory() === cat.key) {
+                <div class="products-grid">
+                  @for (product of getProductsByCategory(cat.key); track product.id) {
+                    <div class="product-card" (click)="selectProduct(cat.key, product)">
+                      <div class="img-wrapper">
+                        <img
+                          [src]="product.image || defaultImage"
+                          (error)="handleMissingImage($event)"
+                          [alt]="product.name"
+                          loading="lazy"
+                        />
+                      </div>
+
+                      <h3>{{ product.name }}</h3>
+
+                      <div class="specs">
+                        {{
+                          product.specs.socket ||
+                            product.specs.memoryType ||
+                            (product.specs.wattage ? product.specs.wattage + 'W' : '')
+                        }}
+                      </div>
+
+                      <div class="price">${{ product.price }}</div>
                     </div>
-
-                    <h3>{{ product.name }}</h3>
-
-                    <div class="specs">
-                      {{
-                        product.specs.socket ||
-                          product.specs.memoryType ||
-                          product.specs.wattage + 'W'
-                      }}
+                  }
+                  @if (getProductsByCategory(cat.key).length === 0) {
+                    <div class="empty-filter">
+                      There are no compatible components for your build. Try changing your processor
+                      or motherboard.
                     </div>
-
-                    <div class="price">${{ product.price }}</div>
-                  </div>
-                }
-                @if (getProductsByCategory(cat.key).length === 0) {
-                  <div class="empty-filter">
-                    There are no compatible components for your build. Try changing your processor
-                    or motherboard.
-                  </div>
-                }
-              </div>
+                  }
+                </div>
+              } @else {
+                <div class="empty-slot" (click)="openCategory(cat.key)">
+                  <div class="placeholder-icon">+</div>
+                  <div class="placeholder-text">Add {{ cat.label }}</div>
+                  <button class="btn-add">Select</button>
+                </div>
+              }
             }
           </div>
         </div>
