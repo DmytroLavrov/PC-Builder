@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { Category, Product } from '@models/product.model';
 import { BuilderService } from '@services/builder.service';
 import { BuildsManagerComponent } from '@components/builder/builds-manager/builds-manager.component';
@@ -14,6 +14,12 @@ export class BuilderComponent {
   public builderService: BuilderService = inject(BuilderService);
 
   public activeCategory = signal<Category | null>(null);
+
+  public activeCategoryLabel = computed(() => {
+    const active = this.activeCategory();
+    if (!active) return '';
+    return this.categories.find((c) => c.key === active)?.label || '';
+  });
 
   public defaultImage = 'https://placehold.co/600x400/1e293b/ffffff?text=PC+Component';
 
@@ -32,16 +38,18 @@ export class BuilderComponent {
   }
 
   public openCategory(category: Category): void {
-    if (this.activeCategory() === category) {
-      this.activeCategory.set(null);
-    } else {
-      this.activeCategory.set(category);
-    }
+    this.activeCategory.set(category);
+    document.body.style.overflow = 'hidden';
+  }
+
+  public closeCategory(): void {
+    this.activeCategory.set(null);
+    document.body.style.overflow = '';
   }
 
   public selectProduct(category: Category, product: Product): void {
     this.builderService.selectProduct(category, product);
-    this.activeCategory.set(null);
+    this.closeCategory();
   }
 
   public handleMissingImage(event: Event): void {

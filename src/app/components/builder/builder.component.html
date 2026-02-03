@@ -9,12 +9,9 @@
   <div class="layout">
     <div class="parts-list">
       @for (cat of categories; track cat.key) {
-        <div class="category-section" [class.is-active]="activeCategory() === cat.key">
+        <div class="category-section">
           <div class="cat-header">
             <h2>{{ cat.label }}</h2>
-            @if (!builderService.build()[cat.key] && activeCategory() === cat.key) {
-              <button class="btn-text" (click)="activeCategory.set(null)">Close</button>
-            }
           </div>
 
           <div class="cat-content">
@@ -38,46 +35,13 @@
                 </button>
               </div>
             } @else {
-              @if (activeCategory() === cat.key) {
-                <div class="products-grid">
-                  @for (product of getProductsByCategory(cat.key); track product.id) {
-                    <div class="product-card" (click)="selectProduct(cat.key, product)">
-                      <div class="img-wrapper">
-                        <img
-                          [src]="product.image || defaultImage"
-                          (error)="handleMissingImage($event)"
-                          [alt]="product.name"
-                          loading="lazy"
-                        />
-                      </div>
-
-                      <h3>{{ product.name }}</h3>
-
-                      <div class="specs">
-                        {{
-                          product.specs.socket ||
-                            product.specs.memoryType ||
-                            (product.specs.wattage ? product.specs.wattage + 'W' : '')
-                        }}
-                      </div>
-
-                      <div class="price">${{ product.price }}</div>
-                    </div>
-                  }
-                  @if (getProductsByCategory(cat.key).length === 0) {
-                    <div class="empty-filter">
-                      There are no compatible components for your build. Try changing your processor
-                      or motherboard.
-                    </div>
-                  }
-                </div>
-              } @else {
-                <div class="empty-slot" (click)="openCategory(cat.key)">
+              <div class="empty-slot" (click)="openCategory(cat.key)">
+                <div class="left-content">
                   <div class="placeholder-icon">+</div>
                   <div class="placeholder-text">Add {{ cat.label }}</div>
-                  <button class="btn-add">Select</button>
                 </div>
-              }
+                <button class="btn-add">Select</button>
+              </div>
             }
           </div>
         </div>
@@ -88,24 +52,19 @@
       <div class="sticky-wrapper">
         <div class="summary-card">
           <h2>Summary</h2>
-
           <div class="stat-row">
             <span>Power Draw</span>
             <span>{{ builderService.totalWattage() }}W</span>
           </div>
-
           <div class="stat-row">
             <span>Items</span>
             <span>{{ builderService.selectedItemsCount() }} / 7 pcs</span>
           </div>
-
           <div class="stat-row total">
             <span>Total</span>
             <span>${{ builderService.totalPrice() }}</span>
           </div>
-
           <button class="btn-checkout">🛒 Buy Build</button>
-
           @if (builderService.compatibilityIssues().length > 0) {
             <div class="issues-list">
               @for (issue of builderService.compatibilityIssues(); track issue) {
@@ -122,3 +81,45 @@
     </aside>
   </div>
 </div>
+
+@if (activeCategory(); as activeKey) {
+  <div class="modal-backdrop" (click)="closeCategory()">
+    <div class="modal-window" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Select {{ activeCategoryLabel() }}</h3>
+        <button class="btn-close-modal" (click)="closeCategory()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="products-grid">
+          @for (product of getProductsByCategory(activeKey); track product.id) {
+            <div class="product-card" (click)="selectProduct(activeKey, product)">
+              <div class="img-wrapper">
+                <img
+                  [src]="product.image || defaultImage"
+                  (error)="handleMissingImage($event)"
+                  [alt]="product.name"
+                  loading="lazy"
+                />
+              </div>
+              <h3>{{ product.name }}</h3>
+              <div class="specs">
+                {{
+                  product.specs.socket ||
+                    product.specs.memoryType ||
+                    (product.specs.wattage ? product.specs.wattage + 'W' : '')
+                }}
+              </div>
+              <div class="price">${{ product.price }}</div>
+            </div>
+          }
+          @if (getProductsByCategory(activeKey).length === 0) {
+            <div class="empty-filter">
+              No compatible components found. Try changing other parts.
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+}
