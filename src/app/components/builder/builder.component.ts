@@ -2,10 +2,11 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { Category, Product } from '@models/product.model';
 import { BuilderService } from '@services/builder.service';
 import { BuildsManagerComponent } from '@components/builder/builds-manager/builds-manager.component';
+import { ProductSelectorComponent } from '@components/builder/product-selector/product-selector.component';
 
 @Component({
   selector: 'app-builder',
-  imports: [BuildsManagerComponent],
+  imports: [BuildsManagerComponent, ProductSelectorComponent],
   templateUrl: './builder.component.html',
   styleUrl: './builder.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
