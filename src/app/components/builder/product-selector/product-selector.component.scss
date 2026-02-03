@@ -64,7 +64,6 @@
   padding: $spacing-lg;
   background: var(--bg-main);
 
-  // Використовуємо наш міксін для скролу
   @include custom-scrollbar;
 }
 
