@@ -60,3 +60,30 @@
     @content;
   }
 }
+
+@mixin custom-scrollbar {
+  &::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+    margin: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-thumb);
+    border-radius: 5px;
+
+    border: 2px solid transparent;
+    background-clip: content-box;
+
+    &:hover {
+      background-color: var(--scrollbar-thumb-hover);
+    }
+  }
+
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
+}

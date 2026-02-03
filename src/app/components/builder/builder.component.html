@@ -29,43 +29,18 @@
                 <button
                   class="btn-remove"
                   (click)="builderService.removeProduct(cat.key)"
-                  title="Delete"
+                  title="Remove"
                 >
                   ✕
                 </button>
               </div>
             } @else {
-              <div class="products-grid">
-                @for (product of getProductsByCategory(cat.key); track product.id) {
-                  <div class="product-card" (click)="selectProduct(cat.key, product)">
-                    <div class="img-wrapper">
-                      <img
-                        [src]="product.image || defaultImage"
-                        (error)="handleMissingImage($event)"
-                        [alt]="product.name"
-                        loading="lazy"
-                      />
-                    </div>
-
-                    <h3>{{ product.name }}</h3>
-
-                    <div class="specs">
-                      {{
-                        product.specs.socket ||
-                          product.specs.memoryType ||
-                          product.specs.wattage + 'W'
-                      }}
-                    </div>
-
-                    <div class="price">${{ product.price }}</div>
-                  </div>
-                }
-                @if (getProductsByCategory(cat.key).length === 0) {
-                  <div class="empty-filter">
-                    There are no compatible components for your build. Try changing your processor
-                    or motherboard.
-                  </div>
-                }
+              <div class="empty-slot" (click)="openCategory(cat.key)">
+                <div class="left-content">
+                  <div class="placeholder-icon">+</div>
+                  <div class="placeholder-text">Add {{ cat.label }}</div>
+                </div>
+                <button class="btn-add">Select</button>
               </div>
             }
           </div>
@@ -77,24 +52,19 @@
       <div class="sticky-wrapper">
         <div class="summary-card">
           <h2>Summary</h2>
-
           <div class="stat-row">
             <span>Power Draw</span>
             <span>{{ builderService.totalWattage() }}W</span>
           </div>
-
           <div class="stat-row">
             <span>Items</span>
             <span>{{ builderService.selectedItemsCount() }} / 7 pcs</span>
           </div>
-
           <div class="stat-row total">
             <span>Total</span>
             <span>${{ builderService.totalPrice() }}</span>
           </div>
-
           <button class="btn-checkout">🛒 Buy Build</button>
-
           @if (builderService.compatibilityIssues().length > 0) {
             <div class="issues-list">
               @for (issue of builderService.compatibilityIssues(); track issue) {
@@ -111,3 +81,12 @@
     </aside>
   </div>
 </div>
+
+@if (activeCategory(); as activeKey) {
+  <app-product-selector
+    [categoryLabel]="activeCategoryLabel()"
+    [products]="getProductsByCategory(activeKey)"
+    (select)="selectProduct(activeKey, $event)"
+    (close)="closeCategory()"
+  />
+}

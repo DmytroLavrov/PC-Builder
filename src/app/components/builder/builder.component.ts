@@ -1,17 +1,26 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { Category, Product } from '@models/product.model';
 import { BuilderService } from '@services/builder.service';
 import { BuildsManagerComponent } from '@components/builder/builds-manager/builds-manager.component';
+import { ProductSelectorComponent } from '@components/builder/product-selector/product-selector.component';
 
 @Component({
   selector: 'app-builder',
-  imports: [BuildsManagerComponent],
+  imports: [BuildsManagerComponent, ProductSelectorComponent],
   templateUrl: './builder.component.html',
   styleUrl: './builder.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BuilderComponent {
   public builderService: BuilderService = inject(BuilderService);
+
+  public activeCategory = signal<Category | null>(null);
+
+  public activeCategoryLabel = computed(() => {
+    const active = this.activeCategory();
+    if (!active) return '';
+    return this.categories.find((c) => c.key === active)?.label || '';
+  });
 
   public defaultImage = 'https://placehold.co/600x400/1e293b/ffffff?text=PC+Component';
 
@@ -29,8 +38,19 @@ export class BuilderComponent {
     return this.builderService.filterProducts(category);
   }
 
+  public openCategory(category: Category): void {
+    this.activeCategory.set(category);
+    document.body.style.overflow = 'hidden';
+  }
+
+  public closeCategory(): void {
+    this.activeCategory.set(null);
+    document.body.style.overflow = '';
+  }
+
   public selectProduct(category: Category, product: Product): void {
     this.builderService.selectProduct(category, product);
+    this.closeCategory();
   }
 
   public handleMissingImage(event: Event): void {
