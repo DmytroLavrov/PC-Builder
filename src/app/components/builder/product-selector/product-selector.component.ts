@@ -11,6 +11,7 @@ import { Product } from '@models/product.model';
 export class ProductSelectorComponent {
   @Input({ required: true }) categoryLabel!: string;
   @Input({ required: true }) products!: Product[];
+  @Input() totalCount: number = 0;
 
   @Output() select = new EventEmitter<Product>();
   @Output() close = new EventEmitter<void>();
