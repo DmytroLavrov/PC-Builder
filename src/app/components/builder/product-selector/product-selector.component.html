@@ -13,11 +13,17 @@
 
       <div class="sort-wrapper">
         <label for="sort">Sort by:</label>
+        <select id="sort" (change)="onSortChange($event)" [value]="currentSort()">
+          <option value="default">Default</option>
+          <option value="price-asc">Price: Low to High</option>
+          <option value="price-desc">Price: High to Low</option>
+          <option value="name">Name (A-Z)</option>
+        </select>
       </div>
     </div>
     <div class="modal-body">
       <div class="products-grid">
-        @for (product of products; track product.id) {
+        @for (product of sortedProducts; track product.id) {
           <div class="product-card" (click)="select.emit(product)">
             <div class="img-wrapper">
               <img
