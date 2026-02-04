@@ -38,6 +38,10 @@ export class BuilderComponent {
     return this.builderService.filterProducts(category);
   }
 
+  public getTotalCountByCategory(category: Category): number {
+    return this.builderService.products().filter((p) => p.category === category).length;
+  }
+
   public openCategory(category: Category): void {
     this.activeCategory.set(category);
     document.body.style.overflow = 'hidden';

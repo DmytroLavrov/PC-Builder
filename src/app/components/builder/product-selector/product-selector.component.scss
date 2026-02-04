@@ -59,6 +59,68 @@
   }
 }
 
+.controls-bar {
+  padding: $spacing-md $spacing-lg;
+  background: var(--bg-hover);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-md;
+
+  @media (max-width: 576px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .stats {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+
+    .count-badge {
+      color: var(--color-success);
+      font-weight: 600;
+      background: rgba(16, 185, 129, 0.1);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
+
+    .total-text {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+  }
+
+  .sort-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    label {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    select {
+      padding: 6px 12px;
+      border-radius: $radius-sm;
+      border: 1px solid var(--border-color);
+      background: var(--bg-card);
+      color: var(--text-main);
+      font-size: 0.9rem;
+      cursor: pointer;
+      outline: none;
+
+      &:focus {
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+      }
+    }
+  }
+}
+
 .modal-body {
   overflow-y: auto;
   padding: $spacing-lg;
