@@ -29,14 +29,22 @@ export class ProductSelectorComponent {
 
   public currentSort = signal<SortOption>('default');
 
-  public get sortedProducts(): Product[] {
-    const sort = this.currentSort();
+  public searchQuery = signal<string>('');
 
-    if (sort === 'default') {
-      return this.products;
+  public get displayedProducts(): Product[] {
+    const query = this.searchQuery().toLowerCase().trim();
+    const sort = this.currentSort();
+    let result = this.products;
+
+    if (query) {
+      result = result.filter((p) => p.name.toLowerCase().includes(query));
     }
 
-    return [...this.products].sort((a, b) => {
+    if (sort === 'default') {
+      return result;
+    }
+
+    return [...result].sort((a, b) => {
       switch (sort) {
         case 'price-asc':
           return a.price - b.price;
@@ -57,6 +65,11 @@ export class ProductSelectorComponent {
   public onSortChange(event: Event): void {
     const value = (event.target as HTMLSelectElement).value as SortOption;
     this.setSort(value);
+  }
+
+  public onSearch(event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
+    this.searchQuery.set(value);
   }
 
   public handleMissingImage(event: Event): void {
