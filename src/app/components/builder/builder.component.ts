@@ -35,16 +35,18 @@ export class BuilderComponent {
   ];
 
   public getProductsByCategory(category: Category): Product[] {
-    return this.builderService.filterProducts(category);
+    return this.builderService.getCompatibleProducts(category);
   }
 
   public getTotalCountByCategory(category: Category): number {
-    return this.builderService.products().filter((p) => p.category === category).length;
+    return this.builderService.activeCategoryProducts().length;
   }
 
   public openCategory(category: Category): void {
     this.activeCategory.set(category);
     document.body.style.overflow = 'hidden';
+
+    this.builderService.loadProductsByCategory(category);
   }
 
   public closeCategory(): void {

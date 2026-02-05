@@ -21,6 +21,7 @@ export class ProductSelectorComponent {
   @Input({ required: true }) categoryLabel!: string;
   @Input({ required: true }) products!: Product[];
   @Input() totalCount: number = 0;
+  @Input() isLoading: boolean = false;
 
   @Output() select = new EventEmitter<Product>();
   @Output() close = new EventEmitter<void>();

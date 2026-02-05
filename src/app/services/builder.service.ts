@@ -1,6 +1,6 @@
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { Category, PCBuild, Product, SavedBuild } from '../models/product.model';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '@env/environment';
 
 @Injectable({
@@ -9,7 +9,11 @@ import { environment } from '@env/environment';
 export class BuilderService {
   private http: HttpClient = inject(HttpClient);
 
-  public products = signal<Product[]>([]);
+  public categoryCache = new Map<Category, Product[]>();
+
+  public activeCategoryProducts = signal<Product[]>([]);
+
+  public isLoading = signal<boolean>(false);
 
   public build = signal<PCBuild>({
     cpu: null,
@@ -31,7 +35,6 @@ export class BuilderService {
   public currentBuildName = signal<string>('Untitled Build');
 
   constructor() {
-    this.fetchProducts();
     this.loadSavedBuilds();
 
     // Auto-save current build
@@ -46,13 +49,26 @@ export class BuilderService {
     });
   }
 
-  private fetchProducts(): void {
-    this.http.get<Product[]>(environment.apiUrl).subscribe({
+  public loadProductsByCategory(category: Category): void {
+    if (this.categoryCache.has(category)) {
+      this.activeCategoryProducts.set(this.categoryCache.get(category)!);
+      return;
+    }
+
+    this.isLoading.set(true);
+    this.activeCategoryProducts.set([]);
+
+    const params = new HttpParams().set('category', category);
+
+    this.http.get<Product[]>(environment.apiUrl, { params }).subscribe({
       next: (data) => {
-        this.products.set(data);
+        this.categoryCache.set(category, data);
+        this.activeCategoryProducts.set(data);
+        this.isLoading.set(false);
       },
       error: (err) => {
-        console.error('Error connecting to server:', err);
+        console.error('Error loading products:', err);
+        this.isLoading.set(false);
       },
     });
   }
@@ -258,10 +274,9 @@ export class BuilderService {
 
   // === EXISTING METHODS ===
 
-  public filterProducts(category: Category): Product[] {
-    const allProducts = this.products();
+  public getCompatibleProducts(category: Category): Product[] {
+    let products = this.activeCategoryProducts();
     const b = this.build();
-    let products = allProducts.filter((p) => p.category === category);
 
     // 1. Motherboard filter by CPU
     if (category === 'motherboard' && b.cpu) {

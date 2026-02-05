@@ -87,6 +87,7 @@
     [categoryLabel]="activeCategoryLabel()"
     [products]="getProductsByCategory(activeKey)"
     [totalCount]="getTotalCountByCategory(activeKey)"
+    [isLoading]="builderService.isLoading()"
     (select)="selectProduct(activeKey, $event)"
     (close)="closeCategory()"
   />

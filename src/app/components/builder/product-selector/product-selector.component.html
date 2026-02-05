@@ -34,47 +34,54 @@
     </div>
 
     <div class="modal-body">
-      <div class="products-grid">
-        @for (product of visibleProducts; track product.id) {
-          <div class="product-card" (click)="select.emit(product)">
-            <div class="img-wrapper">
-              <img
-                [src]="product.image || defaultImage"
-                (error)="handleMissingImage($event)"
-                [alt]="product.name"
-                loading="lazy"
-              />
-            </div>
-            <h3>{{ product.name }}</h3>
-            <div class="specs">
-              {{
-                product.specs.socket ||
-                  product.specs.memoryType ||
-                  (product.specs.wattage ? product.specs.wattage + 'W' : '')
-              }}
-            </div>
-            <div class="price">${{ product.price }}</div>
-          </div>
-        }
-
-        @if (displayedProducts.length === 0) {
-          <div class="empty-filter">
-            @if (searchQuery()) {
-              No results found for "{{ searchQuery() }}"
-            } @else {
-              No compatible components found.
-            }
-          </div>
-        }
-      </div>
-
-      @if (visibleProducts.length < displayedProducts.length) {
-        <div class="load-more-container">
-          <div class="load-info">
-            Showing {{ visibleProducts.length }} of {{ displayedProducts.length }}
-          </div>
-          <button class="btn-load-more" (click)="loadMore()">Load More</button>
+      @if (isLoading) {
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <p>Loading components...</p>
         </div>
+      } @else {
+        <div class="products-grid">
+          @for (product of visibleProducts; track product.id) {
+            <div class="product-card" (click)="select.emit(product)">
+              <div class="img-wrapper">
+                <img
+                  [src]="product.image || defaultImage"
+                  (error)="handleMissingImage($event)"
+                  [alt]="product.name"
+                  loading="lazy"
+                />
+              </div>
+              <h3>{{ product.name }}</h3>
+              <div class="specs">
+                {{
+                  product.specs.socket ||
+                    product.specs.memoryType ||
+                    (product.specs.wattage ? product.specs.wattage + 'W' : '')
+                }}
+              </div>
+              <div class="price">${{ product.price }}</div>
+            </div>
+          }
+
+          @if (displayedProducts.length === 0) {
+            <div class="empty-filter">
+              @if (searchQuery()) {
+                No results found for "{{ searchQuery() }}"
+              } @else {
+                No compatible components found.
+              }
+            </div>
+          }
+        </div>
+
+        @if (visibleProducts.length < displayedProducts.length) {
+          <div class="load-more-container">
+            <div class="load-info">
+              Showing {{ visibleProducts.length }} of {{ displayedProducts.length }}
+            </div>
+            <button class="btn-load-more" (click)="loadMore()">Load More</button>
+          </div>
+        }
       }
     </div>
   </div>
