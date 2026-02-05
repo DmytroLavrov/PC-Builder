@@ -35,7 +35,7 @@
 
     <div class="modal-body">
       <div class="products-grid">
-        @for (product of displayedProducts; track product.id) {
+        @for (product of visibleProducts; track product.id) {
           <div class="product-card" (click)="select.emit(product)">
             <div class="img-wrapper">
               <img
@@ -67,6 +67,15 @@
           </div>
         }
       </div>
+
+      @if (visibleProducts.length < displayedProducts.length) {
+        <div class="load-more-container">
+          <div class="load-info">
+            Showing {{ visibleProducts.length }} of {{ displayedProducts.length }}
+          </div>
+          <button class="btn-load-more" (click)="loadMore()">Load More</button>
+        </div>
+      }
     </div>
   </div>
 </div>
