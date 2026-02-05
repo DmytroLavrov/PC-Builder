@@ -85,9 +85,13 @@
 @if (activeCategory(); as activeKey) {
   <app-product-selector
     [categoryLabel]="activeCategoryLabel()"
-    [products]="getProductsByCategory(activeKey)"
-    [totalCount]="getTotalCountByCategory(activeKey)"
+    [products]="builderService.activeCategoryProducts()"
+    [totalCount]="builderService.totalItems()"
+    [isLoading]="builderService.isLoading()"
     (select)="selectProduct(activeKey, $event)"
     (close)="closeCategory()"
+    (sortChange)="builderService.setSort($event)"
+    (searchChange)="builderService.setSearch($event)"
+    (loadMore)="builderService.loadMoreProducts()"
   />
 }

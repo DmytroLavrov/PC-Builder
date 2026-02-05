@@ -14,6 +14,8 @@ export interface Product {
   };
 }
 
+export type SortOption = 'default' | 'price-asc' | 'price-desc' | 'name';
+
 // The state of our build
 export interface PCBuild {
   cpu: Product | null;
