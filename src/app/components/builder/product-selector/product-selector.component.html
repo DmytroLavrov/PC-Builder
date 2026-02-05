@@ -7,24 +7,24 @@
 
     <div class="controls-bar">
       <div class="stats">
-        <span class="count-badge">{{ displayedProducts.length }} compatible</span>
-        <span class="total-text">from {{ totalCount }} total</span>
+        <span class="count-badge">{{ products.length }} loaded</span>
+        <span class="total-text">of {{ totalCount }} total</span>
       </div>
 
       <div class="search-wrapper">
         <input
+          #searchInput
           type="text"
           placeholder="Search components..."
-          [value]="searchQuery()"
           (input)="onSearch($event)"
         />
-        @if (searchQuery()) {
-          <button class="btn-clear" (click)="searchQuery.set('')">✕</button>
+        @if (searchInput.value) {
+          <button class="btn-clear" (click)="clearSearch(searchInput)">✕</button>
         }
       </div>
 
       <div class="sort-wrapper">
-        <select id="sort" (change)="onSortChange($event)" [value]="currentSort()">
+        <select id="sort" (change)="onSortChange($event)">
           <option value="default">Default</option>
           <option value="price-asc">Price: Low to High</option>
           <option value="price-desc">Price: High to Low</option>
@@ -34,54 +34,46 @@
     </div>
 
     <div class="modal-body">
+      <div class="products-grid">
+        @for (product of products; track product.id) {
+          <div class="product-card" (click)="select.emit(product)">
+            <div class="img-wrapper">
+              <img
+                [src]="product.image || defaultImage"
+                (error)="handleMissingImage($event)"
+                [alt]="product.name"
+                loading="lazy"
+              />
+            </div>
+            <h3>{{ product.name }}</h3>
+            <div class="specs">
+              {{
+                product.specs.socket ||
+                  product.specs.memoryType ||
+                  (product.specs.wattage ? product.specs.wattage + 'W' : '')
+              }}
+            </div>
+            <div class="price">${{ product.price }}</div>
+          </div>
+        }
+
+        @if (products.length === 0 && !isLoading) {
+          <div class="empty-filter">No components found.</div>
+        }
+      </div>
+
       @if (isLoading) {
         <div class="loading-state">
           <div class="spinner"></div>
-          <p>Loading components...</p>
+          <p>Loading...</p>
         </div>
-      } @else {
-        <div class="products-grid">
-          @for (product of visibleProducts; track product.id) {
-            <div class="product-card" (click)="select.emit(product)">
-              <div class="img-wrapper">
-                <img
-                  [src]="product.image || defaultImage"
-                  (error)="handleMissingImage($event)"
-                  [alt]="product.name"
-                  loading="lazy"
-                />
-              </div>
-              <h3>{{ product.name }}</h3>
-              <div class="specs">
-                {{
-                  product.specs.socket ||
-                    product.specs.memoryType ||
-                    (product.specs.wattage ? product.specs.wattage + 'W' : '')
-                }}
-              </div>
-              <div class="price">${{ product.price }}</div>
-            </div>
-          }
+      }
 
-          @if (displayedProducts.length === 0) {
-            <div class="empty-filter">
-              @if (searchQuery()) {
-                No results found for "{{ searchQuery() }}"
-              } @else {
-                No compatible components found.
-              }
-            </div>
-          }
+      @if (products.length < totalCount && !isLoading) {
+        <div class="load-more-container">
+          <div class="load-info">Showing {{ products.length }} of {{ totalCount }}</div>
+          <button class="btn-load-more" (click)="loadMore.emit()">Load More</button>
         </div>
-
-        @if (visibleProducts.length < displayedProducts.length) {
-          <div class="load-more-container">
-            <div class="load-info">
-              Showing {{ visibleProducts.length }} of {{ displayedProducts.length }}
-            </div>
-            <button class="btn-load-more" (click)="loadMore()">Load More</button>
-          </div>
-        }
       }
     </div>
   </div>
