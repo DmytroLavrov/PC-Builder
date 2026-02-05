@@ -31,6 +31,9 @@ export class ProductSelectorComponent {
 
   public searchQuery = signal<string>('');
 
+  public readonly pageSize = 24;
+  public currentLimit = signal<number>(this.pageSize);
+
   public get displayedProducts(): Product[] {
     const query = this.searchQuery().toLowerCase().trim();
     const sort = this.currentSort();
@@ -40,22 +43,29 @@ export class ProductSelectorComponent {
       result = result.filter((p) => p.name.toLowerCase().includes(query));
     }
 
-    if (sort === 'default') {
-      return result;
+    if (sort !== 'default') {
+      result = [...result].sort((a, b) => {
+        switch (sort) {
+          case 'price-asc':
+            return a.price - b.price;
+          case 'price-desc':
+            return b.price - a.price;
+          case 'name':
+            return a.name.localeCompare(b.name);
+          default:
+            return 0;
+        }
+      });
     }
+    return result;
+  }
 
-    return [...result].sort((a, b) => {
-      switch (sort) {
-        case 'price-asc':
-          return a.price - b.price;
-        case 'price-desc':
-          return b.price - a.price;
-        case 'name':
-          return a.name.localeCompare(b.name);
-        default:
-          return 0;
-      }
-    });
+  public get visibleProducts(): Product[] {
+    return this.displayedProducts.slice(0, this.currentLimit());
+  }
+
+  public loadMore(): void {
+    this.currentLimit.update((v) => v + this.pageSize);
   }
 
   public setSort(option: SortOption): void {
@@ -65,11 +75,13 @@ export class ProductSelectorComponent {
   public onSortChange(event: Event): void {
     const value = (event.target as HTMLSelectElement).value as SortOption;
     this.setSort(value);
+    this.currentLimit.set(this.pageSize);
   }
 
   public onSearch(event: Event): void {
     const value = (event.target as HTMLInputElement).value;
     this.searchQuery.set(value);
+    this.currentLimit.set(this.pageSize);
   }
 
   public handleMissingImage(event: Event): void {
