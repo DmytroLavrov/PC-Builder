@@ -77,15 +77,12 @@
 
     .count-badge {
       color: var(--color-success);
-      font-weight: 600;
-      background: rgba(16, 185, 129, 0.1);
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-size: 0.9rem;
+      font-weight: 700;
+      font-size: 1.1rem;
     }
     .total-text {
       color: var(--text-muted);
-      font-size: 0.85rem;
+      font-size: 0.9rem;
     }
   }
 
@@ -126,7 +123,6 @@
       cursor: pointer;
       font-size: 0.8rem;
       padding: 4px;
-
       &:hover {
         color: var(--color-danger);
       }
@@ -144,10 +140,8 @@
       top: 50%;
       width: 8px;
       height: 8px;
-
       border-right: 2px solid var(--text-muted);
       border-bottom: 2px solid var(--text-muted);
-
       transform: translateY(-60%) rotate(45deg);
       pointer-events: none;
       transition: border-color 0.2s;
@@ -161,7 +155,6 @@
       -webkit-appearance: none;
       -moz-appearance: none;
       appearance: none;
-
       padding: 8px 36px 8px 12px;
       border-radius: $radius-sm;
       border: 1px solid var(--border-color);
@@ -170,7 +163,6 @@
       font-size: 0.9rem;
       cursor: pointer;
       outline: none;
-
       padding-right: 40px;
 
       &:focus {
@@ -184,11 +176,9 @@
     flex-direction: column;
     align-items: stretch;
     gap: $spacing-md;
-
     .search-wrapper {
       order: -1;
     }
-
     .stats,
     .sort-wrapper {
       justify-content: space-between;
@@ -201,7 +191,6 @@
   overflow-y: auto;
   padding: $spacing-lg;
   background: var(--bg-main);
-
   @include custom-scrollbar;
 }
 
@@ -274,6 +263,64 @@
   }
 }
 
+.product-card.skeleton {
+  cursor: default;
+  pointer-events: none;
+
+  &:hover {
+    transform: none;
+    box-shadow: none;
+    border-color: var(--border-color);
+  }
+
+  .sk-img,
+  .sk-title,
+  .sk-specs,
+  .sk-price {
+    background: linear-gradient(
+      90deg,
+      var(--bg-hover) 25%,
+      var(--border-color-hover) 50%,
+      var(--bg-hover) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite linear;
+    border-radius: 4px;
+  }
+
+  .sk-img {
+    height: 140px;
+    width: 100%;
+    margin-bottom: $spacing-md;
+  }
+
+  .sk-title {
+    height: 1.2rem;
+    width: 80%;
+    margin-bottom: $spacing-xs;
+  }
+
+  .sk-specs {
+    height: 1rem;
+    width: 40%;
+    margin-bottom: $spacing-sm;
+  }
+
+  .sk-price {
+    height: 1.2rem;
+    width: 30%;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
 .empty-filter {
   grid-column: 1 / -1;
   text-align: center;
@@ -282,37 +329,6 @@
   border-radius: $radius-md;
   color: var(--text-muted);
   border: 1px dashed var(--border-color);
-}
-
-@media (max-width: 576px) {
-  .modal-window {
-    height: 100%;
-    max-height: 100%;
-    border-radius: 0;
-  }
-  .products-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slideUp {
-  from {
-    transform: translateY(20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
 }
 
 .load-more-container {
@@ -354,27 +370,33 @@
   }
 }
 
-.loading-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: $spacing-xl * 2;
-  color: var(--text-muted);
-
-  .spinner {
-    width: 40px;
-    height: 40px;
-    border: 3px solid var(--border-color);
-    border-top-color: var(--color-primary);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-bottom: $spacing-md;
+@media (max-width: 576px) {
+  .modal-window {
+    height: 100%;
+    max-height: 100%;
+    border-radius: 0;
+  }
+  .products-grid {
+    grid-template-columns: 1fr;
   }
 }
 
-@keyframes spin {
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
   to {
-    transform: rotate(360deg);
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
   }
 }

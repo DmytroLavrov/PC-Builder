@@ -57,22 +57,26 @@
           </div>
         }
 
+        @if (isLoading) {
+          @for (item of skeletonItems; track $index) {
+            <div class="product-card skeleton">
+              <div class="sk-img"></div>
+              <div class="sk-title"></div>
+              <div class="sk-specs"></div>
+              <div class="sk-price"></div>
+            </div>
+          }
+        }
+
         @if (products.length === 0 && !isLoading) {
           <div class="empty-filter">No components found.</div>
         }
       </div>
 
-      @if (isLoading) {
-        <div class="loading-state">
-          <div class="spinner"></div>
-          <p>Loading...</p>
-        </div>
-      }
-
       @if (products.length < totalCount && !isLoading) {
         <div class="load-more-container">
           <div class="load-info">Showing {{ products.length }} of {{ totalCount }}</div>
-          <button class="btn-load-more" (click)="loadMore.emit()">Load More</button>
+          <button class="btn-load-more" (click)="loadMore.emit()">Load More from Server</button>
         </div>
       }
     </div>
