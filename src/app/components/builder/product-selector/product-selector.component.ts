@@ -33,13 +33,7 @@ export class ProductSelectorComponent {
 
   public searchQuery = signal<string>('');
 
-  // public loadMore(): void {
-  //   this.currentLimit.update((v) => v + this.pageSize);
-  // }
-
-  // public setSort(option: SortOption): void {
-  //   this.currentSort.set(option);
-  // }
+  public skeletonItems = new Array(12);
 
   public onSortChange(event: Event): void {
     const value = (event.target as HTMLSelectElement).value as SortOption;
