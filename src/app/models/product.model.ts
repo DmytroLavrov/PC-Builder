@@ -11,6 +11,7 @@ export interface Product {
     memoryType?: string; // For RAM and Motherboard (e.g. "DDR5")
     wattage?: number; // For PSU (power) and others (consumption)
     formFactor?: string; // ATX, Micro-ATX, Mini-ITX
+    vram?: string;
   };
 }
 
