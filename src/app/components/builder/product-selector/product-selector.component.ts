@@ -11,11 +11,11 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Category, Product, SortOption } from '@models/product.model';
-import { CommonModule } from '@angular/common';
+import { ProductCardComponent } from '@components/builder/product-card/product-card.component';
 
 @Component({
   selector: 'app-product-selector',
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, ProductCardComponent],
   templateUrl: './product-selector.component.html',
   styleUrl: './product-selector.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -34,7 +34,6 @@ export class ProductSelectorComponent {
   @Output() loadMore = new EventEmitter<void>();
   @Output() filtersChange = new EventEmitter<any>();
 
-  public defaultImage = 'https://placehold.co/600x400/1e293b/ffffff?text=PC+Component';
   public currentSort: SortOption = 'default';
 
   public searchQuery = signal<string>('');
@@ -156,9 +155,5 @@ export class ProductSelectorComponent {
   public clearSearch(input: HTMLInputElement): void {
     input.value = '';
     this.searchChange.emit('');
-  }
-
-  public handleMissingImage(event: Event): void {
-    (event.target as HTMLImageElement).src = this.defaultImage;
   }
 }

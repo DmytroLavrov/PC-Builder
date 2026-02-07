@@ -70,35 +70,12 @@
 
       <div class="products-grid">
         @for (product of products; track product.id) {
-          <div class="product-card" (click)="select.emit(product)">
-            <div class="img-wrapper">
-              <img
-                [src]="product.image || defaultImage"
-                (error)="handleMissingImage($event)"
-                [alt]="product.name"
-                loading="lazy"
-              />
-            </div>
-            <h3>{{ product.name }}</h3>
-            <div class="specs">
-              {{
-                product.specs.socket ||
-                  product.specs.memoryType ||
-                  (product.specs.wattage ? product.specs.wattage + 'W' : '')
-              }}
-            </div>
-            <div class="price">${{ product.price }}</div>
-          </div>
+          <app-product-card [product]="product" (select)="select.emit($event)"></app-product-card>
         }
 
         @if (isLoading) {
           @for (item of skeletonItems; track $index) {
-            <div class="product-card skeleton">
-              <div class="sk-img"></div>
-              <div class="sk-title"></div>
-              <div class="sk-specs"></div>
-              <div class="sk-price"></div>
-            </div>
+            <app-product-card [isSkeleton]="true"></app-product-card>
           }
         }
 
