@@ -3,6 +3,12 @@ import { Category, PCBuild, Product, SavedBuild, SortOption } from '@models/prod
 import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
 import { environment } from '@env/environment';
 
+export interface FilterState {
+  minPrice?: number;
+  maxPrice?: number;
+  [key: string]: any; // For dynamic specs (specs.socket etc.)
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -28,10 +34,11 @@ export class BuilderService {
     psu: null,
     case: null,
   });
-
   public savedBuilds = signal<SavedBuild[]>([]);
   public currentBuildId = signal<string | null>(null);
   public currentBuildName = signal<string>('Untitled Build');
+
+  private currentFilters = signal<FilterState>({});
 
   constructor() {
     this.loadSavedBuilds();
@@ -50,12 +57,18 @@ export class BuilderService {
 
   public loadProductsByCategory(category: Category): void {
     this.currentCategory.set(category);
-
     this.currentPage.set(1);
     this.currentSort.set('default');
     this.currentSearch.set('');
+    this.currentFilters.set({});
     this.activeCategoryProducts.set([]);
 
+    this.fetchData();
+  }
+
+  public setFilters(filters: FilterState): void {
+    this.currentFilters.set(filters);
+    this.currentPage.set(1);
     this.fetchData();
   }
 
@@ -109,32 +122,44 @@ export class BuilderService {
       }
     }
 
-    this.http
-      .get<Product[]>(`${environment.apiUrl}/products`, { params, observe: 'response' })
-      .subscribe({
-        next: (resp: HttpResponse<Product[]>) => {
-          const newData = resp.body || [];
+    const filters = this.currentFilters();
+    if (filters.minPrice) params = params.set('price_gte', filters.minPrice);
+    if (filters.maxPrice) params = params.set('price_lte', filters.maxPrice);
 
-          const totalHeader = resp.headers.get('X-Total-Count');
-          if (totalHeader) {
-            this.totalItems.set(Number(totalHeader));
-          } else {
-            if (!append) this.totalItems.set(newData.length);
-          }
+    Object.keys(filters).forEach((key) => {
+      if (key !== 'minPrice' && key !== 'maxPrice' && filters[key]) {
+        params = params.set(key, filters[key]);
+      }
+    });
 
-          if (append) {
-            this.activeCategoryProducts.update((current) => [...current, ...newData]);
-          } else {
-            this.activeCategoryProducts.set(newData);
-          }
+    const baseUrl = environment.apiUrl.endsWith('/products')
+      ? environment.apiUrl
+      : `${environment.apiUrl}/products`;
 
-          this.isLoading.set(false);
-        },
-        error: (err) => {
-          console.error('Error loading products:', err);
-          this.isLoading.set(false);
-        },
-      });
+    this.http.get<Product[]>(baseUrl, { params, observe: 'response' }).subscribe({
+      next: (resp: HttpResponse<Product[]>) => {
+        const newData = resp.body || [];
+
+        const totalHeader = resp.headers.get('X-Total-Count');
+        if (totalHeader) {
+          this.totalItems.set(Number(totalHeader));
+        } else {
+          if (!append) this.totalItems.set(newData.length);
+        }
+
+        if (append) {
+          this.activeCategoryProducts.update((current) => [...current, ...newData]);
+        } else {
+          this.activeCategoryProducts.set(newData);
+        }
+
+        this.isLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Error loading products:', err);
+        this.isLoading.set(false);
+      },
+    });
   }
 
   public getCompatibleProducts(category: Category): Product[] {

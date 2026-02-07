@@ -1,0 +1,30 @@
+@if (isSkeleton) {
+  <div class="card-content skeleton">
+    <div class="sk-img"></div>
+    <div class="sk-title"></div>
+    <div class="sk-specs"></div>
+    <div class="sk-price"></div>
+  </div>
+} @else if (product) {
+  <div class="card-content" (click)="select.emit(product)">
+    <div class="img-wrapper">
+      <img
+        [src]="product.image || defaultImage"
+        (error)="handleMissingImage($event)"
+        [alt]="product.name"
+        loading="lazy"
+      />
+    </div>
+    <h3>{{ product.name }}</h3>
+    <div class="specs">
+      {{
+        product.specs.socket ||
+          product.specs.memoryType ||
+          (product.specs.wattage ? product.specs.wattage + 'W' : '') ||
+          product.specs.vram ||
+          product.specs.formFactor
+      }}
+    </div>
+    <div class="price">${{ product.price }}</div>
+  </div>
+}
