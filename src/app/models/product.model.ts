@@ -9,9 +9,13 @@ export interface Product {
   specs: {
     socket?: string; // For CPU and Motherboard (e.g. "AM5", "LGA1700")
     memoryType?: string; // For RAM and Motherboard (e.g. "DDR5")
-    wattage?: number; // For PSU (power) and others (consumption)
+    wattage?: number; // For PSU and other components (power consumption)
     formFactor?: string; // ATX, Micro-ATX, Mini-ITX
-    vram?: string;
+    vram?: string; // Video memory size (for GPU, e.g. "8GB", "12GB")
+    length?: number; // GPU length in millimeters
+    maxGpuLength?: number; // Maximum supported GPU length (for Case), mm
+    height?: number; // Cooler height in millimeters (for CPU Cooler)
+    maxCpuCoolerHeight?: number; // Maximum supported CPU cooler height (for Case), mm
   };
 }
 
