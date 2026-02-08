@@ -7,6 +7,8 @@
   </div>
 } @else if (product) {
   <div class="card-content" (click)="select.emit(product)">
+    <button class="btn-info" (click)="onInfoClick($event)" title="View Details">ℹ</button>
+
     <div class="img-wrapper">
       <img
         [src]="product.image || defaultImage"

@@ -291,6 +291,11 @@
     }
   }
 
+  &.no-padding {
+    padding: 0;
+    overflow-x: hidden;
+  }
+
   .stats {
     display: flex;
     align-items: baseline;
