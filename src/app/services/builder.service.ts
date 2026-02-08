@@ -249,6 +249,30 @@ export class BuilderService {
       }
     }
 
+    // Check: GPU Length vs Case
+    if (b.case && b.gpu && b.case.specs.maxGpuLength && b.gpu.specs.length) {
+      if (b.gpu.specs.length > b.case.specs.maxGpuLength) {
+        errors.push(
+          `Physical: GPU is too long (${b.gpu.specs.length}mm)! Case max: ${b.case.specs.maxGpuLength}mm.`,
+        );
+      }
+    }
+
+    // Check: PSU Power Buffer
+    if (b.psu) {
+      const totalW = this.totalWattage();
+      const psuW = b.psu.specs.wattage || 0;
+
+      // Recommended margin +20%
+      const recommended = Math.ceil(totalW * 1.2);
+
+      if (psuW < totalW) {
+        errors.push(`CRITICAL: PSU is too weak! System uses ${totalW}W, PSU has ${psuW}W.`);
+      } else if (psuW < recommended) {
+        errors.push(`Warning: Low PSU headroom. Recommended: ${recommended}W (+20% buffer).`);
+      }
+    }
+
     return errors;
   });
 
