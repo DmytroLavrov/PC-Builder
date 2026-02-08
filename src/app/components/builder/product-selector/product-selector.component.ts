@@ -12,10 +12,11 @@ import {
 import { FormsModule } from '@angular/forms';
 import { Category, Product, SortOption } from '@models/product.model';
 import { ProductCardComponent } from '@components/builder/product-card/product-card.component';
+import { ProductDetailsComponent } from '@components/builder/product-details/product-details.component';
 
 @Component({
   selector: 'app-product-selector',
-  imports: [FormsModule, ProductCardComponent],
+  imports: [FormsModule, ProductCardComponent, ProductDetailsComponent],
   templateUrl: './product-selector.component.html',
   styleUrl: './product-selector.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -33,6 +34,8 @@ export class ProductSelectorComponent {
   @Output() searchChange = new EventEmitter<string>();
   @Output() loadMore = new EventEmitter<void>();
   @Output() filtersChange = new EventEmitter<any>();
+
+  public defaultImage = 'https://placehold.co/600x400/1e293b/ffffff?text=PC+Component';
 
   public currentSort: SortOption = 'default';
 
@@ -92,6 +95,8 @@ export class ProductSelectorComponent {
 
     return hasPrice || hasSpecs;
   }
+
+  public selectedProductForDetails = signal<Product | null>(null);
 
   constructor() {
     effect(() => {
@@ -155,5 +160,17 @@ export class ProductSelectorComponent {
   public clearSearch(input: HTMLInputElement): void {
     input.value = '';
     this.searchChange.emit('');
+  }
+
+  public showProductDetails(product: Product): void {
+    this.selectedProductForDetails.set(product);
+  }
+
+  public closeProductDetails(): void {
+    this.selectedProductForDetails.set(null);
+  }
+
+  public onSelectProduct(product: Product): void {
+    this.select.emit(product);
   }
 }

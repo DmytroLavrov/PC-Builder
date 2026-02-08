@@ -5,89 +5,110 @@
       <button class="btn-close-modal" (click)="close.emit()">✕</button>
     </div>
 
-    <div class="controls-bar">
-      <button class="btn-filter" [class.active]="showFilters()" (click)="toggleFilters()">
-        <span class="icon">⚙️</span> Filters
-        @if (hasActiveFilters) {
-          <span class="dot"></span>
-        }
-      </button>
+    @if (!selectedProductForDetails()) {
+      <div class="controls-bar">
+        <button class="btn-filter" [class.active]="showFilters()" (click)="toggleFilters()">
+          <span class="icon">⚙️</span> Filters
+          @if (hasActiveFilters) {
+            <span class="dot"></span>
+          }
+        </button>
 
-      <div class="search-wrapper">
-        <input #searchInput type="text" placeholder="Search..." (input)="onSearch($event)" />
-        @if (searchInput.value) {
-          <button class="btn-clear" (click)="clearSearch(searchInput)">✕</button>
-        }
+        <div class="search-wrapper">
+          <input #searchInput type="text" placeholder="Search..." (input)="onSearch($event)" />
+          @if (searchInput.value) {
+            <button class="btn-clear" (click)="clearSearch(searchInput)">✕</button>
+          }
+        </div>
+
+        <div class="sort-wrapper">
+          <select id="sort" (change)="onSortChange($event)">
+            <option value="default">Default</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+            <option value="name">Name (A-Z)</option>
+          </select>
+        </div>
       </div>
 
-      <div class="sort-wrapper">
-        <select id="sort" (change)="onSortChange($event)">
-          <option value="default">Default</option>
-          <option value="price-asc">Price: Low to High</option>
-          <option value="price-desc">Price: High to Low</option>
-          <option value="name">Name (A-Z)</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="filters-panel" [class.is-open]="showFilters()">
-      <div class="filters-content">
-        <div class="filters-grid">
-          <div class="filter-group">
-            <label>Price Range ($)</label>
-            <div class="price-inputs">
-              <input type="number" placeholder="0" [(ngModel)]="filterModel.minPrice" />
-              <span class="separator">-</span>
-              <input type="number" placeholder="Any" [(ngModel)]="filterModel.maxPrice" />
+      <div class="filters-panel" [class.is-open]="showFilters()">
+        <div class="filters-content">
+          <div class="filters-grid">
+            <div class="filter-group">
+              <label>Price Range ($)</label>
+              <div class="price-inputs">
+                <input type="number" placeholder="0" [(ngModel)]="filterModel.minPrice" />
+                <span class="separator">-</span>
+                <input type="number" placeholder="Any" [(ngModel)]="filterModel.maxPrice" />
+              </div>
             </div>
+
+            @for (spec of currentSpecFilters(); track spec.key) {
+              <div class="filter-group">
+                <label>{{ spec.label }}</label>
+                <select [(ngModel)]="filterModel.specs[spec.key]">
+                  <option value="">All</option>
+                  @for (opt of spec.options; track opt) {
+                    <option [value]="opt">{{ opt }}</option>
+                  }
+                </select>
+              </div>
+            }
           </div>
 
-          @for (spec of currentSpecFilters(); track spec.key) {
-            <div class="filter-group">
-              <label>{{ spec.label }}</label>
-              <select [(ngModel)]="filterModel.specs[spec.key]">
-                <option value="">All</option>
-                @for (opt of spec.options; track opt) {
-                  <option [value]="opt">{{ opt }}</option>
-                }
-              </select>
-            </div>
+          <div class="filter-actions">
+            <button class="btn-reset" (click)="resetFilters()">Reset</button>
+            <button class="btn-apply" (click)="applyFilters()">Apply Filters</button>
+          </div>
+        </div>
+      </div>
+    }
+
+    <div
+      class="modal-body"
+      [class.hidden-on-mobile]="showFilters()"
+      [class.no-padding]="selectedProductForDetails()"
+    >
+      @if (!selectedProductForDetails()) {
+        <div class="stats">
+          <span class="count-badge">{{ products.length }} loaded</span>
+          <span class="total-text">of {{ totalCount }} total</span>
+        </div>
+
+        <div class="products-grid">
+          @for (product of products; track product.id) {
+            <app-product-card
+              [product]="product"
+              (select)="select.emit($event)"
+              (info)="showProductDetails($event)"
+            ></app-product-card>
+          }
+
+          @if (isLoading) {
+            @for (item of skeletonItems; track $index) {
+              <app-product-card [isSkeleton]="true"></app-product-card>
+            }
+          }
+
+          @if (products.length === 0 && !isLoading) {
+            <div class="empty-filter">No components found.</div>
           }
         </div>
 
-        <div class="filter-actions">
-          <button class="btn-reset" (click)="resetFilters()">Reset</button>
-          <button class="btn-apply" (click)="applyFilters()">Apply Filters</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="modal-body" [class.hidden-on-mobile]="showFilters()">
-      <div class="stats">
-        <span class="count-badge">{{ products.length }} loaded</span>
-        <span class="total-text">of {{ totalCount }} total</span>
-      </div>
-
-      <div class="products-grid">
-        @for (product of products; track product.id) {
-          <app-product-card [product]="product" (select)="select.emit($event)"></app-product-card>
+        @if (products.length < totalCount && !isLoading) {
+          <div class="load-more-container">
+            <button class="btn-load-more" (click)="loadMore.emit()">Load More</button>
+          </div>
         }
+      }
 
-        @if (isLoading) {
-          @for (item of skeletonItems; track $index) {
-            <app-product-card [isSkeleton]="true"></app-product-card>
-          }
-        }
-
-        @if (products.length === 0 && !isLoading) {
-          <div class="empty-filter">No components found.</div>
-        }
-      </div>
-
-      @if (products.length < totalCount && !isLoading) {
-        <div class="load-more-container">
-          <button class="btn-load-more" (click)="loadMore.emit()">Load More</button>
-        </div>
+      @if (selectedProductForDetails(); as product) {
+        <app-product-details
+          [product]="product"
+          [defaultImage]="defaultImage"
+          (close)="closeProductDetails()"
+          (select)="onSelectProduct($event)"
+        ></app-product-details>
       }
     </div>
   </div>
