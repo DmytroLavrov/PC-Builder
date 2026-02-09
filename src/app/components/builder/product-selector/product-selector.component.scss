@@ -307,8 +307,15 @@
 
     .count-badge {
       color: var(--color-success);
-      font-weight: 700;
-      font-size: 1.1rem;
+      font-weight: 600;
+      background: rgba(16, 185, 129, 0.1);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
+    .total-text {
+      color: var(--text-muted);
+      font-size: 0.85rem;
     }
   }
 }
