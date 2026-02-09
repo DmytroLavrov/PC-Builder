@@ -19,6 +19,12 @@ export interface Product {
   };
 }
 
+export interface ProductFilter {
+  minPrice?: number;
+  maxPrice?: number;
+  [key: string]: string | number | undefined;
+}
+
 export type SortOption = 'default' | 'price-asc' | 'price-desc' | 'name';
 
 // The state of our build

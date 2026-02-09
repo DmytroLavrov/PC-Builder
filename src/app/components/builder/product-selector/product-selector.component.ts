@@ -10,7 +10,7 @@ import {
   untracked,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Category, Product, SortOption } from '@models/product.model';
+import { Category, Product, ProductFilter, SortOption } from '@models/product.model';
 import { ProductCardComponent } from '@components/builder/product-card/product-card.component';
 import { ProductDetailsComponent } from '@components/builder/product-details/product-details.component';
 
@@ -33,7 +33,7 @@ export class ProductSelectorComponent {
   @Output() sortChange = new EventEmitter<SortOption>();
   @Output() searchChange = new EventEmitter<string>();
   @Output() loadMore = new EventEmitter<void>();
-  @Output() filtersChange = new EventEmitter<any>();
+  @Output() filtersChange = new EventEmitter<ProductFilter>();
 
   public defaultImage = 'https://placehold.co/600x400/1e293b/ffffff?text=PC+Component';
 
@@ -125,7 +125,7 @@ export class ProductSelectorComponent {
   }
 
   public applyFilters(): void {
-    const filters: any = {};
+    const filters: ProductFilter = {};
 
     if (this.filterModel.minPrice) filters.minPrice = this.filterModel.minPrice;
     if (this.filterModel.maxPrice) filters.maxPrice = this.filterModel.maxPrice;
