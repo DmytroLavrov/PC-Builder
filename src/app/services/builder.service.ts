@@ -176,11 +176,11 @@ export class BuilderService {
     const b = this.build();
     // Assume the base system consumption is 50W
     let total = 50;
-    Object.values(b).forEach((p) => {
-      if (p?.specs.wattage && p.category !== 'psu') {
-        total += p.specs.wattage;
-      }
-    });
+
+    if (b.cpu) total += b.cpu.specs.wattage;
+    if (b.gpu) total += b.gpu.specs.wattage;
+
+    if (b.motherboard) total += 50;
 
     return total;
   });
