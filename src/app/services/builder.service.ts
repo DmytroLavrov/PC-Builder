@@ -1,19 +1,23 @@
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
-import { Category, PCBuild, Product, SavedBuild, SortOption } from '@models/product.model';
-import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
-import { environment } from '@env/environment';
-
-export interface FilterState {
-  minPrice?: number;
-  maxPrice?: number;
-  [key: string]: any; // For dynamic specs (specs.socket etc.)
-}
+import {
+  Category,
+  PCBuild,
+  Product,
+  ProductFilter,
+  SavedBuild,
+  SortOption,
+} from '@models/product.model';
+import { HttpResponse } from '@angular/common/http';
+import { ProductApiService } from '@services/product-api.service';
+import { StorageService } from '@services/storage.service';
+import { CompatibilityValidator } from '@utils/compatibility.validator';
 
 @Injectable({
   providedIn: 'root',
 })
 export class BuilderService {
-  private http: HttpClient = inject(HttpClient);
+  private apiService: ProductApiService = inject(ProductApiService);
+  private storage: StorageService = inject(StorageService);
 
   public activeCategoryProducts = signal<Product[]>([]);
   public isLoading = signal<boolean>(false);
@@ -24,6 +28,7 @@ export class BuilderService {
   private readonly itemsPerPage = 24;
   private currentSort = signal<SortOption>('default');
   private currentSearch = signal<string>('');
+  private currentFilters = signal<ProductFilter>({});
 
   public build = signal<PCBuild>({
     cpu: null,
@@ -34,11 +39,10 @@ export class BuilderService {
     psu: null,
     case: null,
   });
+
   public savedBuilds = signal<SavedBuild[]>([]);
   public currentBuildId = signal<string | null>(null);
   public currentBuildName = signal<string>('Untitled Build');
-
-  private currentFilters = signal<FilterState>({});
 
   constructor() {
     this.loadSavedBuilds();
@@ -55,6 +59,8 @@ export class BuilderService {
     });
   }
 
+  // --- API / Data Loading Section ---
+
   public loadProductsByCategory(category: Category): void {
     this.currentCategory.set(category);
     this.currentPage.set(1);
@@ -62,11 +68,10 @@ export class BuilderService {
     this.currentSearch.set('');
     this.currentFilters.set({});
     this.activeCategoryProducts.set([]);
-
     this.fetchData();
   }
 
-  public setFilters(filters: FilterState): void {
+  public setFilters(filters: ProductFilter): void {
     this.currentFilters.set(filters);
     this.currentPage.set(1);
     this.fetchData();
@@ -98,69 +103,42 @@ export class BuilderService {
 
     this.isLoading.set(true);
 
-    let params = new HttpParams()
-      .set('category', category)
-      .set('_page', this.currentPage())
-      .set('_limit', this.itemsPerPage);
+    this.apiService
+      .getProducts(
+        category,
+        this.currentPage(),
+        this.itemsPerPage,
+        this.currentSort(),
+        this.currentSearch(),
+        this.currentFilters(),
+      )
+      .subscribe({
+        next: (resp: HttpResponse<Product[]>) => {
+          const newData = resp.body || [];
+          const totalHeader = resp.headers.get('X-Total-Count');
 
-    if (this.currentSearch()) {
-      params = params.set('q', this.currentSearch());
-    }
+          if (totalHeader) {
+            this.totalItems.set(Number(totalHeader));
+          } else {
+            if (!append) this.totalItems.set(newData.length);
+          }
 
-    const sort = this.currentSort();
-    if (sort !== 'default') {
-      switch (sort) {
-        case 'price-asc':
-          params = params.set('_sort', 'price').set('_order', 'asc');
-          break;
-        case 'price-desc':
-          params = params.set('_sort', 'price').set('_order', 'desc');
-          break;
-        case 'name':
-          params = params.set('_sort', 'name').set('_order', 'asc');
-          break;
-      }
-    }
+          if (append) {
+            this.activeCategoryProducts.update((current) => [...current, ...newData]);
+          } else {
+            this.activeCategoryProducts.set(newData);
+          }
 
-    const filters = this.currentFilters();
-    if (filters.minPrice) params = params.set('price_gte', filters.minPrice);
-    if (filters.maxPrice) params = params.set('price_lte', filters.maxPrice);
-
-    Object.keys(filters).forEach((key) => {
-      if (key !== 'minPrice' && key !== 'maxPrice' && filters[key]) {
-        params = params.set(key, filters[key]);
-      }
-    });
-
-    const baseUrl = environment.apiUrl.endsWith('/products')
-      ? environment.apiUrl
-      : `${environment.apiUrl}/products`;
-
-    this.http.get<Product[]>(baseUrl, { params, observe: 'response' }).subscribe({
-      next: (resp: HttpResponse<Product[]>) => {
-        const newData = resp.body || [];
-
-        const totalHeader = resp.headers.get('X-Total-Count');
-        if (totalHeader) {
-          this.totalItems.set(Number(totalHeader));
-        } else {
-          if (!append) this.totalItems.set(newData.length);
-        }
-
-        if (append) {
-          this.activeCategoryProducts.update((current) => [...current, ...newData]);
-        } else {
-          this.activeCategoryProducts.set(newData);
-        }
-
-        this.isLoading.set(false);
-      },
-      error: (err) => {
-        console.error('Error loading products:', err);
-        this.isLoading.set(false);
-      },
-    });
+          this.isLoading.set(false);
+        },
+        error: (err) => {
+          console.error('Error loading products:', err);
+          this.isLoading.set(false);
+        },
+      });
   }
+
+  // --- Build Management Section ---
 
   public getCompatibleProducts(category: Category): Product[] {
     return this.activeCategoryProducts();
@@ -179,6 +157,8 @@ export class BuilderService {
       [category]: null,
     }));
   }
+
+  // --- Computations ---
 
   public totalPrice = computed(() => {
     const b = this.build();
@@ -206,94 +186,23 @@ export class BuilderService {
   });
 
   public compatibilityIssues = computed(() => {
-    const b = this.build();
-    const errors: string[] = [];
-
-    // Check: Processor <-> Motherboard (Socket)
-    if (b.cpu && b.motherboard) {
-      if (b.cpu.specs.socket !== b.motherboard.specs.socket) {
-        errors.push(
-          `Incompatibility: CPU requires socket ${b.cpu.specs.socket}, and motherboard has ${b.motherboard.specs.socket}`,
-        );
-      }
-    }
-
-    // Check: RAM <-> Motherboard (DDR type)
-    if (b.ram && b.motherboard) {
-      if (b.ram.specs.memoryType !== b.motherboard.specs.memoryType) {
-        errors.push(
-          `Incompatibility: Board supports ${b.motherboard.specs.memoryType}, and memory ${b.ram.specs.memoryType}`,
-        );
-      }
-    }
-
-    // Check: Power supply (is there enough power)
-    if (b.psu && b.psu.specs.wattage! < this.totalWattage()) {
-      errors.push(
-        `Warning: Power supply too weak! Consumption: ${this.totalWattage()}W, PSU: ${b.psu.specs.wattage}W`,
-      );
-    }
-
-    // Check: CASE vs BOARD
-    if (b.case && b.motherboard) {
-      const caseSize = b.case.specs.formFactor;
-      const boardSize = b.motherboard.specs.formFactor;
-      if (caseSize === 'Micro-ATX' && boardSize === 'ATX') {
-        errors.push(
-          `Physical incompatibility: Board ${boardSize} will not fit in case ${caseSize}!`,
-        );
-      }
-
-      if (caseSize === 'Mini-ITX' && (boardSize === 'ATX' || boardSize === 'Micro-ATX')) {
-        errors.push(`The board is too big for this Mini-ITX case.`);
-      }
-    }
-
-    // Check: GPU Length vs Case
-    if (b.case && b.gpu && b.case.specs.maxGpuLength && b.gpu.specs.length) {
-      if (b.gpu.specs.length > b.case.specs.maxGpuLength) {
-        errors.push(
-          `Physical: GPU is too long (${b.gpu.specs.length}mm)! Case max: ${b.case.specs.maxGpuLength}mm.`,
-        );
-      }
-    }
-
-    // Check: PSU Power Buffer
-    if (b.psu) {
-      const totalW = this.totalWattage();
-      const psuW = b.psu.specs.wattage || 0;
-
-      // Recommended margin +20%
-      const recommended = Math.ceil(totalW * 1.2);
-
-      if (psuW < totalW) {
-        errors.push(`CRITICAL: PSU is too weak! System uses ${totalW}W, PSU has ${psuW}W.`);
-      } else if (psuW < recommended) {
-        errors.push(`Warning: Low PSU headroom. Recommended: ${recommended}W (+20% buffer).`);
-      }
-    }
-
-    return errors;
+    return CompatibilityValidator.validate(this.build(), this.totalWattage());
   });
 
-  private loadSavedBuilds(): void {
-    const saved = localStorage.getItem('pc-builds');
-    if (saved) {
-      try {
-        const builds = JSON.parse(saved) as SavedBuild[];
-        this.savedBuilds.set(builds);
+  // --- Persistence Section  ---
 
-        // Load the last active build or create new one
-        const lastActiveId = localStorage.getItem('last-active-build-id');
-        if (lastActiveId && builds.find((b) => b.id === lastActiveId)) {
-          this.loadBuild(lastActiveId);
-        } else if (builds.length > 0) {
-          this.loadBuild(builds[0].id);
-        } else {
-          this.createNewBuild('My First Build');
-        }
-      } catch (e) {
-        console.error('Corrupted save file');
+  private loadSavedBuilds(): void {
+    const builds = this.storage.getItem<SavedBuild[]>('pc-builds');
+
+    if (builds) {
+      this.savedBuilds.set(builds);
+      const lastActiveId = this.storage.getItem<string>('last-active-build-id');
+
+      if (lastActiveId && builds.find((b) => b.id === lastActiveId)) {
+        this.loadBuild(lastActiveId);
+      } else if (builds.length > 0) {
+        this.loadBuild(builds[0].id);
+      } else {
         this.createNewBuild('My First Build');
       }
     } else {
@@ -302,9 +211,9 @@ export class BuilderService {
   }
 
   private saveBuildsToStorage(): void {
-    localStorage.setItem('pc-builds', JSON.stringify(this.savedBuilds()));
+    this.storage.setItem('pc-builds', this.savedBuilds());
     if (this.currentBuildId()) {
-      localStorage.setItem('last-active-build-id', this.currentBuildId()!);
+      this.storage.setItem('last-active-build-id', this.currentBuildId());
     }
   }
 
