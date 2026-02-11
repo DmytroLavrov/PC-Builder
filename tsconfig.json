@@ -12,7 +12,8 @@
       "@env/*": ["src/environments/*"],
       "@models/*": ["src/app/models/*"],
       "@services/*": ["src/app/services/*"],
-      "@components/*": ["src/app/components/*"]
+      "@components/*": ["src/app/components/*"],
+      "@utils/*": ["src/app/utils/*"]
     },
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
